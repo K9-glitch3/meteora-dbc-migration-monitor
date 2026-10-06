@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DBC Migration Monitor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Meteora DBC reviewer package</p>
+      <h1>DBC Migration Monitor</h1>
+    </div>
+    <span class="status">Recorded evidence</span>
+  </header>
+
+  <main>
+    <section class="summary" aria-labelledby="summary-title">
+      <div>
+        <h2 id="summary-title">Evidence before claims</h2>
+        <p>The monitor keeps unsupported and unavailable observations visible. It does not turn missing data into a successful comparison.</p>
+      </div>
+      <dl class="metrics" id="metrics" aria-live="polite">
+        <div><dt>Sampled</dt><dd>200</dd></div>
+        <div><dt>Comparable</dt><dd>166</dd></div>
+        <div><dt>Math matched</dt><dd>132</dd></div>
+        <div><dt>Excluded</dt><dd>34</dd></div>
+      </dl>
+    </section>
+
+    <section class="flow" aria-labelledby="flow-title">
+      <div class="section-heading">
+        <h2 id="flow-title">Validation flow</h2>
+        <p>Two accounting stages, with every non-comparable outcome retained.</p>
+      </div>
+      <div class="stage">
+        <div class="stage-title"><span>01</span><h3>Stream to chain</h3></div>
+        <div class="bar" role="img" aria-label="166 comparable, 33 unavailable, 1 non-swap">
+          <span class="matched" style="flex:166"></span>
+          <span class="unavailable" style="flex:33"></span>
+          <span class="nonswap" style="flex:1"></span>
+        </div>
+        <div class="legend">
+          <span><i class="matched"></i>166 comparable</span>
+          <span><i class="unavailable"></i>33 unavailable</span>
+          <span><i class="nonswap"></i>1 non-swap</span>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-title"><span>02</span><h3>Supported math</h3></div>
+        <div class="bar" role="img" aria-label="132 matched, 14 not applicable, 16 unsupported, 4 partial fills skipped">
+          <span class="matched" style="flex:132"></span>
+          <span class="na" style="flex:14"></span>
+          <span class="unsupported" style="flex:16"></span>
+          <span class="partial" style="flex:4"></span>
+        </div>
+        <div class="legend">
+          <span><i class="matched"></i>132 matched</span>
+          <span><i class="na"></i>14 N/A</span>
+          <span><i class="unsupported"></i>16 unsupported</span>
+          <span><i class="partial"></i>4 partial</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="boundary" aria-labelledby="boundary-title">
+      <div class="section-heading">
+        <h2 id="boundary-title">Decision boundary</h2>
+        <p>A supported result needs complete evidence and a configuration inside the declared scope.</p>
+      </div>
+      <div class="outcomes">
+        <article><strong>Supported comparison</strong><p>Comparable stream state and chain event, supported pool, matching math.</p></article>
+        <article><strong>No conclusion</strong><p>Unavailable transaction, non-swap write, or skipped partial fill.</p></article>
+        <article><strong>Unsupported</strong><p>Pool configuration lies outside the implemented pricing boundary.</p></article>
+        <article><strong>Rejected</strong><p>A comparable stream or math observation does not match.</p></article>
+      </div>
+    </section>
+
+    <aside class="disclosure">
+      <strong>Scope disclosure</strong>
+      <p>Recorded internal evidence only. No independent chain revalidation, full SDK equivalence, profitability, finality, or token-safety claim.</p>
+    </aside>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

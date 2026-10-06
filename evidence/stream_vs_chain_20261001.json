@@ -1,0 +1,22 @@
+{
+  "seconds": 120,
+  "updates": 3156,
+  "pools": 284,
+  "sampled": 200,
+  "A_stream_equals_chain": 166,
+  "B_not_applicable": 14,
+  "B_math_equals_chain": 132,
+  "B_unsupported_pool": 16,
+  "tx_unavailable": 33,
+  "B_partial_fill_skipped": 4,
+  "no_swap_event (liquidity/fee/other write)": 1,
+  "stream_counts": {
+    "connects": 1,
+    "updates": 3156,
+    "retained": 3156,
+    "stale_ordering": 0,
+    "disconnects": 1,
+    "errors": 0
+  },
+  "problems": []
+}

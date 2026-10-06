@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dbc-migration-monitor"
+version = "0.1.0"
+description = "Evidence-first reviewer utilities for Meteora DBC to DAMM v2 migration monitoring"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Michael Owusu"}]
+
+[project.scripts]
+dbc-monitor = "dbc_monitor.__main__:main"
+
+[tool.setuptools]
+packages = ["dbc_monitor"]
