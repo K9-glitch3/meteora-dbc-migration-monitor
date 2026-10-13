@@ -1,35 +1,46 @@
 # DBC Migration Monitor
 
-An evidence-first reviewer package for Meteora DBC to DAMM v2 migration tooling.
+DBC Migration Monitor helps Solana developers inspect what happens when a
+Meteora Dynamic Bonding Curve graduates to DAMM v2. It follows streamed
+account changes, checks migration and pool-role data, calculates supported
+prices, and keeps missing or unsupported observations visible.
 
-The private prototype detects migration candidates, checks pool-role bindings,
-tracks supported DAMM v2 account state, and applies integer quote arithmetic.
-This public package exposes the verification model and retained aggregate
-evidence without shipping wallets, signers, trade execution, private strategy,
-or credentials.
+The product is intended for launchpad builders, trading-terminal developers,
+indexers and risk teams that need dependable migration data rather than a
+single opaque alert.
 
-## What is included
+## What it does
 
-- A standard-library Python validator for the retained aggregate evidence.
-- An explicit verdict model that refuses to turn missing evidence into success.
-- Unit tests for valid, malformed, and unsupported observations.
-- A static reviewer dashboard in `web/`.
-- Architecture, evidence, and prior-work disclosures in `docs/`.
+- Detects supported DBC graduation and migration observations.
+- Checks that the expected pool and token roles are connected.
+- Applies integer pricing for supported DAMM v2 configurations.
+- Compares streamed account state with available chain events.
+- Reports unavailable, unsupported and partial observations separately.
+- Produces structured evidence that can be reviewed and reproduced.
 
-## Recorded evidence
+## Public reviewer package
 
-The retained 120-second internal run sampled 200 account updates:
+This repository contains:
 
-- 166 had matching streamed state and a comparable chain swap event.
+- A Python validator for the retained aggregate evidence.
+- A static dashboard in `web/`.
+- Eleven automated tests covering valid, malformed and unsupported inputs.
+- Architecture notes and a prior-work disclosure in `docs/`.
+
+## Development-run evidence
+
+One retained 120-second development run processed 200 account updates:
+
+- 166 had streamed state and a comparable chain swap event.
 - 33 transactions were unavailable.
 - 1 update did not contain a comparable swap event.
-- Of the 166 comparable observations, 132 math comparisons matched.
-- The other 34 were not applicable, unsupported, or skipped partial fills.
+- 132 of the 166 comparable observations produced supported mathematical
+  comparisons and matched.
+- The remaining 34 were classified as not applicable, unsupported, or skipped
+  partial fills and were not counted as matches.
 
-These are recorded internal results, not a fresh independent chain audit. The
-coverage exclusions are not counted as successful comparisons. No claim of
-profitability, token safety, finality, customer adoption, or complete Meteora
-feature support is made.
+These results describe the retained development run. They are not presented as
+customer validation or as an independent audit of the Solana chain.
 
 ## Run the checks
 
@@ -40,24 +51,22 @@ python -m dbc_monitor evidence/stream_vs_chain_20261001.json
 python -m unittest discover -s tests -v
 ```
 
-Open `web/index.html` directly for the static evidence dashboard.
+Open `web/index.html` directly to view the dashboard.
 
-## Scope boundary
+## Project status
 
-This repository is a reviewer-facing reference package, not a trading system,
-an RPC service, a live market-data promise, or an SDK-equivalence claim. The
-full private implementation and raw validation corpus remain outside this
-repository pending licensing, attribution, and reviewer-access decisions.
+The product is pre-pilot. The next milestone is to test the workflow with a
+small group of launchpad, terminal, indexer and risk-tool developers.
 
-## Development disclosure
-
-The DBC/DAMM v2 foundation predates the Crypto World's Fair competition. Work
-recorded during the competition period included keeper-ticket integration,
-streamed-state pricing, comparison evidence, latency work, and this bounded
-reviewer package. See `docs/PRIOR_WORK_DISCLOSURE.md`.
+The public package does not contain credentials, wallets or private execution
+components. The DBC and DAMM v2 technical foundation predates Crypto World's
+Fair; the competition-period work is recorded in
+`docs/PRIOR_WORK_DISCLOSURE.md`.
 
 ## License
 
-The code created specifically for this reviewer package is provided under the
-MIT License. That license does not grant rights to excluded private code,
-Meteora software, Solana software, or third-party material.
+Code created for this reviewer package is available under the MIT License.
+Third-party software and protocol names remain subject to their own rights and
+licences.
+
+
