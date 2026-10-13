@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="DBC Migration Monitor turns Meteora DBC and DAMM v2 account streams into inspectable migration evidence.">
+  <title>DBC Migration Monitor</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Solana migration infrastructure</p>
+      <h1>DBC Migration Monitor</h1>
+      <p class="lede">Inspect streamed migration state, supported pricing and every observation that could not be compared.</p>
+    </div>
+    <a class="repo" href="https://github.com/K9-glitch3/meteora-dbc-migration-monitor">View source</a>
+  </header>
+
+  <main>
+    <section class="summary" aria-labelledby="summary-title">
+      <div>
+        <p class="section-label">Development evidence</p>
+        <h2 id="summary-title">A result is useful only when its limits remain visible.</h2>
+        <p>The monitor separates supported comparisons from unavailable transactions, unsupported configurations and partial observations.</p>
+      </div>
+      <dl class="metrics">
+        <div><dt>Updates processed</dt><dd>200</dd></div>
+        <div><dt>Comparable</dt><dd>166</dd></div>
+        <div><dt>Math matched</dt><dd>132</dd></div>
+        <div><dt>Classified separately</dt><dd>34</dd></div>
+      </dl>
+    </section>
+
+    <section class="flow" aria-labelledby="flow-title">
+      <div class="section-heading">
+        <div><p class="section-label">Recorded run</p><h2 id="flow-title">From stream to supported comparison</h2></div>
+        <p>Two stages preserve the denominator, so an unavailable or unsupported observation never becomes a match.</p>
+      </div>
+
+      <article class="stage">
+        <div class="stage-title"><span>01</span><h3>Stream to chain context</h3></div>
+        <div class="bar" role="img" aria-label="166 comparable observations, 33 unavailable transactions and 1 non-swap observation">
+          <span class="matched" style="flex:166"></span>
+          <span class="unavailable" style="flex:33"></span>
+          <span class="nonswap" style="flex:1"></span>
+        </div>
+        <div class="legend">
+          <span><i class="matched"></i>166 comparable</span>
+          <span><i class="unavailable"></i>33 unavailable</span>
+          <span><i class="nonswap"></i>1 non-swap</span>
+        </div>
+      </article>
+
+      <article class="stage">
+        <div class="stage-title"><span>02</span><h3>Supported mathematical comparison</h3></div>
+        <div class="bar" role="img" aria-label="132 matches, 14 not applicable, 16 unsupported and 4 partial observations">
+          <span class="matched" style="flex:132"></span>
+          <span class="na" style="flex:14"></span>
+          <span class="unsupported" style="flex:16"></span>
+          <span class="partial" style="flex:4"></span>
+        </div>
+        <div class="legend">
+          <span><i class="matched"></i>132 matched</span>
+          <span><i class="na"></i>14 not applicable</span>
+          <span><i class="unsupported"></i>16 unsupported</span>
+          <span><i class="partial"></i>4 partial</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="outcomes" aria-labelledby="outcomes-title">
+      <div class="section-heading">
+        <div><p class="section-label">Product behaviour</p><h2 id="outcomes-title">Four outcomes, not one green light</h2></div>
+      </div>
+      <div class="outcome-grid">
+        <article><strong>Supported comparison</strong><p>The stream state, chain event, pool configuration and pricing result can be compared.</p></article>
+        <article><strong>No conclusion</strong><p>The required transaction or comparable event is unavailable.</p></article>
+        <article><strong>Unsupported</strong><p>The pool configuration lies outside the implemented pricing scope.</p></article>
+        <article><strong>Rejected</strong><p>Comparable evidence is present but does not match.</p></article>
+      </div>
+    </section>
+
+    <footer>
+      <p>Pre-pilot developer tooling. The figures above describe one retained 120-second development run.</p>
+      <div><a href="https://youtu.be/zM0hXea-zZw">Founder pitch</a><a href="https://youtu.be/Ua_gKoqmOn8">Technical demo</a></div>
+    </footer>
+  </main>
+</body>
+</html>
+
+
