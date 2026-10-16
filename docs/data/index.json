@@ -1,5 +1,11 @@
 [
   {
+    "id": "mainnet-hour-2026-10-16",
+    "label": "Mainnet - 16 Oct 2026 (one hour)",
+    "file": "mainnet-hour-2026-10-16.json",
+    "evidence": "mainnet-hour-2026-10-16"
+  },
+  {
     "id": "mainnet-2026-10-16",
     "label": "Mainnet - 16 Oct 2026",
     "file": "mainnet-2026-10-16.json",

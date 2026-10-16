@@ -52,15 +52,20 @@ def check():
     readiness_path=ROOT/"evidence/readiness-2026-10-16.json"
     pools=verify_readiness(json.loads(readiness_path.read_text()))
     assert feed==build(ROOT/"evidence"/feed["source_run"],readiness_path), "Feed differs from source evidence"
-    saved=json.loads((ROOT/"docs/api/v1/quotes.json").read_text())
-    # The comparison report explicitly identifies its source independently of the feed.
     captures=list((ROOT/"evidence").glob("*/capture.jsonl"))
     from dbc_monitor.replay import file_hash
-    source=next(p for p in captures if file_hash(p)==saved["source_capture_sha256"])
-    actual=compare(source)
-    assert saved==actual, "SDK comparison changed"
-    assert actual["cases"] and not actual["counts"].get("MISMATCH"), "No passing SDK reference cases"
-    print(json.dumps({"sdk_matches":actual["counts"],"replayed_readiness_pools":pools,"feed_migrations":len(feed["migrations"])}))
+    reports={}
+    for report_path in sorted((ROOT/"docs/api/v1").glob("quotes*.json")):
+        saved=json.loads(report_path.read_text())
+        source=next(p for p in captures if file_hash(p)==saved["source_capture_sha256"])
+        actual=compare(source)
+        assert saved==actual, "SDK comparison changed"
+        assert actual["cases"] and not actual["counts"].get("MISMATCH"), "No passing SDK reference cases"
+        reports[report_path.name]=actual["counts"]
+    assert reports, "No quote reports"
+    from scripts.reliability_report import report
+    assert json.loads((ROOT/"docs/api/v1/reliability.json").read_text())==report(ROOT/"evidence"/feed["source_run"])
+    print(json.dumps({"sdk_matches":reports,"replayed_readiness_pools":pools,"feed_migrations":len(feed["migrations"])}))
 
 
 if __name__=="__main__":check()
