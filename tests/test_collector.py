@@ -56,3 +56,21 @@ class CollectorTests(unittest.IsolatedAsyncioTestCase):
     async def test_invalid_capacity_prevents_network(self):
         with self.assertRaises(ValueError): await collect("unused",seconds=0)
         with self.assertRaises(ValueError): await collect("unused",max_pools=100)
+
+    async def test_invalid_endpoint_leaves_no_partial_run(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)/"run"
+            with self.assertRaises(ValueError): await collect(root,endpoint="http://invalid.example")
+            self.assertFalse(root.exists())
+
+    async def test_cancellation_is_not_reported_as_complete(self):
+        class CancelledSocket:
+            async def __aenter__(self): raise asyncio.CancelledError()
+            async def __aexit__(self,*args): pass
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)/"run"
+            with patch("websockets.connect",return_value=CancelledSocket()):
+                with self.assertRaises(asyncio.CancelledError): await collect(root,seconds=1)
+            rows=[json.loads(x) for x in (root/"capture.jsonl").read_text().splitlines()]
+            self.assertEqual(rows[-1]["reason"],"interrupted")
+            self.assertEqual(len(rows[0]["collector_code_sha256"]),64)

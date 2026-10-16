@@ -1,39 +1,45 @@
-# Architecture and scope
+# Architecture and evidence boundaries
 
-## Private prototype boundary
+## Public v0.2 pipeline
+1. Confirmed DBC logs identify candidate migrations, not proven migrations.
+2. A bounded worker retrieves finalized transactions, preserving raw responses.
+3. Supported top-level and CPI instructions are decoded and their roles checked.
+4. Pool snapshots use a minimum context slot equal to the migration slot.
+   Up to the configured pool limit receive confirmed account subscriptions.
+5. Schema-validated observations are deterministically derived and frozen.
+6. The browser loads those same exported observations.
 
-The internal system contains four relevant layers:
+## Integrity is not independent authenticity
+Hashes bind the saved capture and derived records. Replay verifies classification
+from that capture. Neither independently proves the RPC provider's claims.
+Finality is the requested provider commitment; signatures are checked for identity,
+not cryptographically reverified.
 
-1. Migration discovery and admission checks.
-2. Pool-role and keeper-ticket binding.
-3. Account-state streaming and freshness handling.
-4. Supported DAMM v2 integer quote arithmetic and semantic evidence.
+Manifests record Git HEAD at freeze time and a replay-source hash. A dirty tree
+can differ from HEAD. New collectors also record a source hash at launch.
+The first 2026-10-16 development capture predates that field; it must not be
+described as collected by the final release commit. Its raw bytes are unchanged.
 
-Execution, wallets, signing, strategy, and operational controls are deliberately
-excluded from this public reviewer package.
+## Failure and reorganisation handling
+- Duplicate signatures are not repeatedly queued. Changed slots are conflicts.
+- A finalized transaction at a different slot is rejected for identity matching.
+- Confirmed account updates are provisional. Older slots are stale; identical
+  pool/slot/payload observations are duplicates.
+- Reconnection restores subscriptions and records gaps. There is no historical
+  gap backfill, rollback state machine or guarantee of complete coverage.
+- Missing finalized transactions remain unavailable after bounded retries.
+- Transaction freshness is capture time minus block time, default 120 seconds
+  with five seconds of clock skew. Account wall-clock freshness remains unknown.
+- Unknown layouts/fee modes are unsupported. Missing evidence is not success.
 
-## Reviewer package
+## Limits
+One worker, a 64-item queue, at most 16 watched pools (default four), 1-3600
+seconds, default 20,000 journal records, bounded message sizes and a 90-second
+drain. Finalization writes may slightly exceed the stream record threshold.
+RPC calls time out after 12 seconds; process shutdown may await an in-flight
+thread. No wallet, signing, execution, key storage or private strategy is included.
 
-`dbc_monitor.evidence` validates the two accounting identities in the retained
-aggregate evidence. It does not contact an RPC endpoint and cannot verify the
-truth of the original observations.
-
-`dbc_monitor.boundary` demonstrates the intended result semantics:
-
-- missing transactions and non-swap writes produce `NO_CONCLUSION`;
-- unsupported pool configurations remain explicit;
-- stream or math mismatches are rejected;
-- only complete, supported matching observations receive
-  `SUPPORTED_COMPARISON`.
-
-The browser dashboard presents the same counts without converting exclusions
-into a headline accuracy percentage.
-
-## Planned release path
-
-1. Resolve attribution and redistribution permissions for any derived source.
-2. Add transaction-level public fixtures with sensitive fields removed.
-3. Publish supported layout and fee-mode documentation.
-4. Add a read-only live integration example with reorganisation and freshness
-   behaviour.
-5. Seek independent developer pilots and document feedback.
+The old aggregate validator only checks accounting identities. Its historical
+private swap-comparison summary is distinct from the new migration-identity
+records. The next separate validation step is same-state, independent swap-quote
+comparison followed by external developer pilots.

@@ -22,4 +22,12 @@ for file in sorted((root/"docs"/"data").glob("*.json")):
     expected = list(read_jsonl(candidates[0].parent/"observations.jsonl"))
     assert expected == data["observations"], f"Browser export mismatch: {file.name}"
 assert count > 0, "No published evidence runs"
+index = root / "docs" / "data" / "index.json"
+if index.exists():
+    items = json.loads(index.read_text())
+    assert items and len({item["id"] for item in items}) == len(items)
+    for item in items:
+        data = json.loads((index.parent / item["file"]).read_text())
+        manifest = json.loads((root / "evidence" / item["evidence"] / "manifest.json").read_text())
+        assert data["manifest"] == manifest, "Dataset index points to inconsistent evidence"
 print(f"Verified {count} evidence runs and dashboard exports")

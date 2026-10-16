@@ -1,0 +1,14 @@
+[
+  {
+    "id": "mainnet-2026-10-16",
+    "label": "Mainnet - 16 Oct 2026",
+    "file": "mainnet-2026-10-16.json",
+    "evidence": "mainnet-2026-10-16"
+  },
+  {
+    "id": "synthetic",
+    "label": "Synthetic edge cases",
+    "file": "synthetic.json",
+    "evidence": "synthetic-v1"
+  }
+]
