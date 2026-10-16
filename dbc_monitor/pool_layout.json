@@ -1,0 +1,196 @@
+{
+  "sdk_commit": "a8e5fedf1cc62e488da477a19ae3c6ad9a707f80",
+  "account_size": 1112,
+  "discriminator": [
+    241,
+    154,
+    109,
+    4,
+    17,
+    177,
+    109,
+    188
+  ],
+  "fields": [
+    {
+      "name": "pool_fees",
+      "offset": 8,
+      "size": 160
+    },
+    {
+      "name": "token_a_mint",
+      "offset": 168,
+      "size": 32
+    },
+    {
+      "name": "token_b_mint",
+      "offset": 200,
+      "size": 32
+    },
+    {
+      "name": "token_a_vault",
+      "offset": 232,
+      "size": 32
+    },
+    {
+      "name": "token_b_vault",
+      "offset": 264,
+      "size": 32
+    },
+    {
+      "name": "whitelisted_vault",
+      "offset": 296,
+      "size": 32
+    },
+    {
+      "name": "padding_0",
+      "offset": 328,
+      "size": 32
+    },
+    {
+      "name": "liquidity",
+      "offset": 360,
+      "size": 16
+    },
+    {
+      "name": "padding_1",
+      "offset": 376,
+      "size": 16
+    },
+    {
+      "name": "protocol_a_fee",
+      "offset": 392,
+      "size": 8
+    },
+    {
+      "name": "protocol_b_fee",
+      "offset": 400,
+      "size": 8
+    },
+    {
+      "name": "dead_liquidity_fee_checkpoint",
+      "offset": 408,
+      "size": 8
+    },
+    {
+      "name": "padding_2",
+      "offset": 416,
+      "size": 8
+    },
+    {
+      "name": "sqrt_min_price",
+      "offset": 424,
+      "size": 16
+    },
+    {
+      "name": "sqrt_max_price",
+      "offset": 440,
+      "size": 16
+    },
+    {
+      "name": "sqrt_price",
+      "offset": 456,
+      "size": 16
+    },
+    {
+      "name": "activation_point",
+      "offset": 472,
+      "size": 8
+    },
+    {
+      "name": "activation_type",
+      "offset": 480,
+      "size": 1
+    },
+    {
+      "name": "pool_status",
+      "offset": 481,
+      "size": 1
+    },
+    {
+      "name": "token_a_flag",
+      "offset": 482,
+      "size": 1
+    },
+    {
+      "name": "token_b_flag",
+      "offset": 483,
+      "size": 1
+    },
+    {
+      "name": "collect_fee_mode",
+      "offset": 484,
+      "size": 1
+    },
+    {
+      "name": "pool_type",
+      "offset": 485,
+      "size": 1
+    },
+    {
+      "name": "fee_version",
+      "offset": 486,
+      "size": 1
+    },
+    {
+      "name": "padding_3",
+      "offset": 487,
+      "size": 1
+    },
+    {
+      "name": "fee_a_per_liquidity",
+      "offset": 488,
+      "size": 32
+    },
+    {
+      "name": "fee_b_per_liquidity",
+      "offset": 520,
+      "size": 32
+    },
+    {
+      "name": "permanent_lock_liquidity",
+      "offset": 552,
+      "size": 16
+    },
+    {
+      "name": "metrics",
+      "offset": 568,
+      "size": 80
+    },
+    {
+      "name": "creator",
+      "offset": 648,
+      "size": 32
+    },
+    {
+      "name": "token_a_amount",
+      "offset": 680,
+      "size": 8
+    },
+    {
+      "name": "token_b_amount",
+      "offset": 688,
+      "size": 8
+    },
+    {
+      "name": "layout_version",
+      "offset": 696,
+      "size": 1
+    },
+    {
+      "name": "padding_4",
+      "offset": 697,
+      "size": 7
+    },
+    {
+      "name": "padding_5",
+      "offset": 704,
+      "size": 24
+    },
+    {
+      "name": "reward_infos",
+      "offset": 728,
+      "size": 384
+    }
+  ]
+}
