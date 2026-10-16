@@ -16,6 +16,7 @@ dbc-monitor = "dbc_monitor.__main__:main"
 
 [tool.setuptools]
 packages = ["dbc_monitor"]
+license-files = ["LICENSE", "docs/METEORA_SDK_LICENSE.txt"]
 
 [tool.setuptools.package-data]
 dbc_monitor = ["*.json"]

@@ -31,3 +31,5 @@ jobs:
       - run: python -m dbc_monitor aggregate evidence/stream_vs_chain_20261001.json
       - name: Verify installable package
         run: python -m pip wheel . --no-deps --wheel-dir dist
+      - name: Verify installed package outside source import path
+        run: python -I -m dbc_monitor verify evidence/synthetic-v1
