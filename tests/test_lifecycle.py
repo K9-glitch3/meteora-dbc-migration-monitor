@@ -22,6 +22,18 @@ class LifecycleTests(unittest.TestCase):
                "reason":"finalized_transaction_unavailable", "details":{}, "slot":None, "observed_at":"2026-10-16T00:00:00Z", "freshness":"unknown", "id":"x"}
         self.assertEqual(migration_rows([row])[0]["stage"], "UNRESOLVED")
 
+    def test_unknown_and_unsupported_states_preserve_pool_identity(self):
+        pool = {"address":"p", "base_mint":"b", "config":"c", "migrated":0,
+                "quote_reserve":"100"}
+        for config in (None, {"address":"other"},
+                       {"address":"c", "migration_option":0},
+                       {"address":"c", "migration_option":1, "threshold":"0"}):
+            result = readiness(pool, config)
+            self.assertIn(result["stage"], ("UNKNOWN", "UNSUPPORTED"))
+            self.assertEqual(result["virtual_pool"], "p")
+            self.assertEqual(result["base_mint"], "b")
+            self.assertNotIn("progress_bps", result)
+
     def test_stale_identity_is_verified_but_stale(self):
         row = {"kind":"migration", "signature":"s", "pool":"p", "stage":"FINALIZED", "verdict":"NO_CONCLUSION",
                "reason":"migration_outside_freshness_window", "details":{}, "slot":1, "observed_at":"2026-10-16T00:00:00Z", "freshness":"stale", "id":"x"}

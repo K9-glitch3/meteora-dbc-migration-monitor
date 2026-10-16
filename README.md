@@ -12,6 +12,9 @@ a browser-local watchlist, recorded read API and bounded finalized-history recov
 [Developer pilot](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/pilot.html) |
 [Read API](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/api/v1/feed.json)
 
+[One-minute walkthrough](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/updates.html#walkthrough) |
+[Continuation plan](docs/CONTINUATION.md)
+
 ## Implemented
 - Versioned JSON observations: source, slot, commitment, freshness, verdict,
   scope, reason and capture hash.

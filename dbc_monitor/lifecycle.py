@@ -3,13 +3,15 @@ from collections import defaultdict
 
 
 def readiness(pool, config):
+    identity = {"virtual_pool": pool.get("address"), "base_mint": pool.get("base_mint"),
+                "config": pool.get("config")} if pool else {}
     if not pool or not config or pool["config"] != config["address"]:
-        return {"stage": "UNKNOWN", "reason": "missing_or_mismatched_config"}
+        return {**identity, "stage": "UNKNOWN", "reason": "missing_or_mismatched_config"}
     if config["migration_option"] != 1 or pool["migrated"] not in (0, 1):
-        return {"stage": "UNSUPPORTED", "reason": "unsupported_migration_configuration"}
+        return {**identity, "stage": "UNSUPPORTED", "reason": "unsupported_migration_configuration"}
     reserve, threshold = int(pool["quote_reserve"]), int(config["threshold"])
     if reserve < 0 or threshold <= 0:
-        return {"stage": "UNKNOWN", "reason": "invalid_threshold_or_reserve"}
+        return {**identity, "stage": "UNKNOWN", "reason": "invalid_threshold_or_reserve"}
     stage = "MIGRATED_FLAG" if pool["migrated"] else "THRESHOLD_REACHED" if reserve >= threshold else "APPROACHING" if reserve*100 >= threshold*90 else "BELOW_THRESHOLD"
     return {"stage": stage, "reason": "captured_account_state_not_forecast", "progress_bps": min(10000, reserve*10000//threshold),
             "quote_reserve": str(reserve), "threshold": str(threshold), "base_mint": pool["base_mint"],

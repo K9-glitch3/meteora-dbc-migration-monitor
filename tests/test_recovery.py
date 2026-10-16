@@ -34,6 +34,18 @@ class RecoveryTests(unittest.TestCase):
         self.assertTrue(result["complete"])
         self.assertEqual(rpc.call.call_count, 1)
 
+    def test_missing_metadata_cannot_establish_complete_history(self):
+        for metadata in (None, {}):
+            rpc = Mock()
+            tx = transaction()
+            tx["meta"] = metadata
+            rpc.call.side_effect = [[{"signature": SIGNATURE, "slot": 100},
+                                     {"signature": "boundary", "slot": 90}], tx]
+            result = recover(rpc, 90)
+            self.assertFalse(result["complete"])
+            self.assertEqual(result["unresolved"], 1)
+            self.assertEqual(result["recovered"], [])
+
     def test_no_boundary_never_complete(self):
         rpc = Mock()
         rpc.call.return_value = []

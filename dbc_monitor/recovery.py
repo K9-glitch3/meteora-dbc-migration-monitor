@@ -36,6 +36,8 @@ def recover(rpc, since_slot, *, known=(), signature_limit=100, transaction_limit
                 if tx is None or tx["slot"] != slot or tx["transaction"]["signatures"][0] != signature:
                     report["unresolved"] += 1
                     continue
+                if not isinstance(tx.get("meta"), dict) or "err" not in tx["meta"]:
+                    raise ValueError("Transaction result metadata is unavailable")
                 if migrations(tx):
                     report["recovered"].append({"signature": signature, "slot": slot, "transaction": tx})
             except (RpcError, ValueError, KeyError, TypeError, IndexError) as exc:
