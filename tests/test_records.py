@@ -39,6 +39,11 @@ class ObservationTests(unittest.TestCase):
         data = captures(); data[2]["result"]["meta"]["err"] = {"InstructionError": [0,"custom"]}
         self.assertEqual(derive(data)[1]["reason"], "transaction_failed")
 
+    def test_missing_success_metadata_is_not_accepted(self):
+        data=captures();del data[2]["result"]["meta"]["err"]
+        self.assertEqual(derive(data)[1]["reason"],"invalid_migration_instruction")
+        self.assertEqual(derive(data)[1]["verdict"],"REJECTED_OBSERVATION")
+
     def test_stale_and_unknown_block_time(self):
         for value, freshness in [(1,"stale"),(None,"unknown")]:
             data = captures(); data[2]["result"]["blockTime"] = value

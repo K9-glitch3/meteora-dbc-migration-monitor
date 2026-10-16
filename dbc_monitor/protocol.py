@@ -29,6 +29,8 @@ def b58encode(value):
 def migrations(tx):
     if not isinstance(tx, dict) or not isinstance(tx.get("meta"), dict):
         return []
+    if "err" not in tx["meta"]:
+        raise ValueError("Transaction success metadata is missing")
     if tx["meta"].get("err") is not None:
         return []
     message = tx["transaction"]["message"]

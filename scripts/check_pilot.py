@@ -1,5 +1,7 @@
 """CI gate for the independently derived pilot API and SDK reference report."""
 import json
+import base64
+import copy
 from pathlib import Path
 import sys
 
@@ -28,6 +30,18 @@ def verify_readiness(receipt):
         row.update(slot=last["result"]["context"]["slot"],observed_at=last["observed_at"],commitment="finalized")
         row["id"]=digest(row);expected.append(row)
     assert expected==receipt["items"], "Readiness differs from captured account bytes"
+    first=next((k,a) for k,a in zip(keys,accounts) if k==pools[0]["address"])
+    negative=[]
+    for mutation in ("owner","length","discriminator"):
+        account=copy.deepcopy(first[1])
+        if mutation=="owner":account["owner"]="invalid"
+        else:
+            raw=bytearray(base64.b64decode(account["data"][0]))
+            if mutation=="length":raw.append(0)
+            else:raw[0]^=1
+            account["data"][0]=base64.b64encode(raw).decode()
+        negative.append({"address":first[0],"account":account})
+    assert decode(negative)==[None,None,None], "Readiness decoder failed negative controls"
     return len(expected)
 
 

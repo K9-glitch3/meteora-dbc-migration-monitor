@@ -27,3 +27,14 @@ accepting arbitrary untrusted inputs or enabling native builds.
 Primary advisory: https://github.com/advisories/GHSA-3gc7-fjrx-p6mg
 SDK sources: https://github.com/MeteoraAg/damm-v2-sdk and
 https://github.com/MeteoraAg/dynamic-bonding-curve-sdk.
+
+## License inventory requiring follow-up
+
+docs/dependency-inventory.json records 86 installed package declarations and
+available top-level notice hashes. The SDKs' MIT declarations do not apply to
+every transitive dependency: rpc-websockets 9.3.9 declares LGPL-3.0-only; chain
+0.4.2 has no package license declaration or top-level notice; text-encoding-utf-8
+1.0.2 has a LICENSE.md but no package license declaration. These are explicit
+review items, not a legal conclusion about compatibility. Node modules are not
+bundled in the Python wheel or browser site. Do not assume this inventory clears
+future redistribution, proprietary bundling or company ownership.

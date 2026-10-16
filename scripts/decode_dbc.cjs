@@ -11,6 +11,7 @@ const result = input.map(item => {
   try {
     const bytes = Buffer.from(account.data[0], 'base64');
     if (account.data[1] !== 'base64' || bytes.length > 8192) return null;
+    if (bytes.length !== coder.size(item.kind === 'config' ? 'PoolConfig' : 'VirtualPool')) return null;
     if (item.kind === 'config') {
       const c = coder.decode('PoolConfig', bytes);
       return {address:item.address, threshold:c.migration_quote_threshold.toString(), migration_option:c.migration_option, quote_mint:c.quote_mint.toBase58()};
