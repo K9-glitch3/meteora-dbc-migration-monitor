@@ -33,7 +33,8 @@ def compare(path):
                 requests.append({"account": c["result"]["value"][0]["data"][0], "amount": str(amount), "direction": direction, "point": str(p["point"])})
                 cases.append({"sequence": c["sequence"], "pool": c["pool"], "slot": c["result"]["context"]["slot"],
                               "account_sha256": p["account_sha256"], "direction": direction, "amount": str(amount),
-                              "fee_numerator": str(p["fee"]), "calculated": calculated})
+                              "fee_numerator": str(p["fee"]), "collect_fee_mode": p["mode"], "current_point": str(p["point"]),
+                              "current_point_basis": "snapshot_slot_or_capture_wallclock; not execution proof", "calculated": calculated})
     run = subprocess.run(["node", str(ROOT/"scripts/sdk_reference.cjs")], input=json.dumps(requests), text=True, capture_output=True, check=True, timeout=120, cwd=ROOT)
     reference = json.loads(run.stdout)
     if len(reference) != len(cases):

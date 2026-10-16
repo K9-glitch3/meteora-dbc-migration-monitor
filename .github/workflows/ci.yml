@@ -26,6 +26,7 @@ jobs:
       - run: python scripts/check_evidence.py
       - run: node --check docs/explorer.js
       - run: node --check docs/monitor.js
+      - run: node --check docs/quotes.js
       - run: python scripts/check_pilot.py
       - run: python -m dbc_monitor aggregate evidence/stream_vs_chain_20261001.json
       - name: Verify installable package

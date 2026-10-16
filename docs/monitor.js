@@ -32,7 +32,7 @@ function addActivity(manual) {
   alerts=alerts.slice(0,100);seenActivity=seenActivity.slice(-1000);save();initialized=true;
 }
 function render(manual=false) {
-  $('watch-count').textContent=watched.length+' addresses';$('watchlist').replaceChildren();
+  $('watch-count').textContent=watched.length+(watched.length===1?' address':' addresses');$('watchlist').replaceChildren();
   for(const address of watched) { const row=el('div',undefined,'watch-item');const b=el('button','\u00d7');b.title='Remove '+address;b.setAttribute('aria-label',b.title);b.onclick=()=>{watched=watched.filter(a=>a!==address);save();render();};row.append(el('code',address),b);$('watchlist').append(row); }
   if(!feed)return;
   addActivity(manual);
@@ -44,7 +44,7 @@ function render(manual=false) {
   const rows=feed.migrations.filter(r=>(!only||matches(r))&&(!stage||r.stage===stage)&&(!search||[r.pool,r.virtual_pool,r.base_mint,r.signature].filter(Boolean).some(v=>v.toLowerCase().includes(search))));
   const pages=Math.max(1,Math.ceil(rows.length/25));page=Math.min(page,pages-1);$('migration-rows').replaceChildren();
   for(const r of rows.slice(page*25,(page+1)*25)) { const tr=el('tr');cell(tr,r.observed_at.slice(11,19));const identity=el('div');identity.append(accountLink(r.pool),el('br'),el('code',short(r.signature)));cell(tr,identity);cell(tr,el('span',r.stage,'stage-pill '+r.stage));cell(tr,r.reason.replaceAll('_',' '));const detail=el('button','Inspect');detail.onclick=()=>openDetail(r);cell(tr,detail);cell(tr,watchButton(r.pool||r.virtual_pool));$('migration-rows').append(tr); }
-  $('migration-count').textContent=rows.length+' observations';$('migration-empty').hidden=rows.length!==0;$('page').textContent='Page '+(page+1)+' of '+pages;$('previous').disabled=page===0;$('next').disabled=page>=pages-1;
+  $('migration-count').textContent=rows.length+(rows.length===1?' observation':' observations');$('migration-empty').hidden=rows.length!==0;$('page').textContent='Page '+(page+1)+' of '+pages;$('previous').disabled=page===0;$('next').disabled=page>=pages-1;
   $('alerts').replaceChildren(...alerts.map(a=>el('li',a.text)));$('alerts-empty').hidden=alerts.length!==0;
 }
 async function refresh() {
