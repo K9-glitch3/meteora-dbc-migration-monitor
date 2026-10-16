@@ -69,6 +69,7 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
                   max_pools=4, max_events=20000):
     import websockets
     from .protocol import migrations
+    from .recovery import recover
     if not 1 <= seconds <= 3600 or not 1 <= max_pools <= 16 or not 1 <= max_events <= 100000:
         raise ValueError("Run duration/capacity outside bounded limits")
     endpoint = endpoint or os.environ.get("DBC_RPC_URL", "https://api.mainnet-beta.solana.com")
@@ -83,12 +84,29 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
     deadline = started + seconds
     stats = {"log_notifications": 0, "migration_candidates": 0, "pool_notifications": 0,
              "duplicates": 0, "reconnects": 0, "rpc_errors": 0, "queue_overflows": 0}
-    seen, pools = {}, set()
+    seen, pools, finalized = {}, set(), set()
+    last_slot = None
     queue = asyncio.Queue(maxsize=64)
     from .replay import code_hash
     journal.write("run_start", collector_code_sha256=code_hash(), duration_seconds=seconds, max_pools=max_pools,
                   max_events=max_events, program=DBC, commitment="confirmed",
                   rpc_host=urlsplit(endpoint).hostname, websocket_host=urlsplit(ws_endpoint).hostname)
+
+    async def snapshot_pools(tx, signature):
+        for migration in migrations(tx):
+            pool = migration["pool"]
+            if len(pools) < max_pools or pool in pools:
+                pools.add(pool)
+            try:
+                snapshot = await asyncio.to_thread(rpc.call, "getMultipleAccounts",
+                    [[pool, migration["base_mint"], migration["quote_mint"]],
+                     {"encoding": "base64", "commitment": "finalized", "minContextSlot": tx["slot"]}])
+                journal.write("pool_snapshot", signature=signature, pool=pool,
+                              addresses=[pool, migration["base_mint"], migration["quote_mint"]],
+                              commitment="finalized", result=snapshot)
+            except RpcError as exc:
+                stats["rpc_errors"] += 1
+                journal.write("rpc_error", operation="getMultipleAccounts", error=str(exc))
 
     async def worker():
         while True:
@@ -108,21 +126,9 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
                     await asyncio.sleep(5)
                 journal.write("transaction", signature=signature, notification_slot=slot,
                               commitment="finalized", result=final)
-                if final is not None:
-                    for migration in migrations(final):
-                        pool = migration["pool"]
-                        if len(pools) < max_pools or pool in pools:
-                            pools.add(pool)
-                        try:
-                            snapshot = await asyncio.to_thread(rpc.call, "getMultipleAccounts",
-                                [[pool, migration["base_mint"], migration["quote_mint"]],
-                                 {"encoding": "base64", "commitment": "finalized", "minContextSlot": final["slot"]}])
-                            journal.write("pool_snapshot", signature=signature, pool=pool,
-                                          addresses=[pool, migration["base_mint"], migration["quote_mint"]],
-                                          commitment="finalized", result=snapshot)
-                        except RpcError as exc:
-                            stats["rpc_errors"] += 1
-                            journal.write("rpc_error", operation="getMultipleAccounts", error=str(exc))
+                if final is not None and final["slot"] == slot and final["transaction"]["signatures"][0] == signature:
+                    finalized.add(signature)
+                    await snapshot_pools(final, signature)
             except (ValueError, KeyError, TypeError, IndexError) as exc:
                 journal.write("decode_error", error=type(exc).__name__)
             finally:
@@ -136,6 +142,23 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
                 async with websockets.connect(ws_endpoint, open_timeout=12, ping_interval=20,
                                                ping_timeout=20, max_size=2**22, max_queue=64) as ws:
                     journal.write("connection_open", epoch=stats["reconnects"])
+                    if stats["reconnects"] and last_slot is not None:
+                        recovered = await asyncio.to_thread(recover, rpc, max(0, last_slot-64), known=list(finalized), transaction_limit=5)
+                        recovered_items = recovered.pop("recovered")
+                        recovered["recovered_count"] = len(recovered_items)
+                        for item in recovered_items:
+                            signature, slot, tx = item["signature"], item["slot"], item["transaction"]
+                            if signature in finalized:
+                                continue
+                            if signature not in seen:
+                                seen[signature] = slot
+                                journal.write("migration_notification", commitment="finalized", discovery="history_backfill",
+                                              result={"context": {"slot": slot}, "value": {"signature": signature, "err": None, "logs": tx["meta"].get("logMessages", [])}})
+                            journal.write("transaction", signature=signature, notification_slot=seen[signature], commitment="finalized", result=tx)
+                            finalized.add(signature)
+                            if seen[signature] == slot:
+                                await snapshot_pools(tx, signature)
+                        journal.write("recovery_report", **recovered)
                     request_id = 1
                     requests, subscriptions = {1: ("logs", DBC)}, {}
                     subscribed = set()
@@ -171,6 +194,7 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
                             continue
                         stats["log_notifications"] += 1
                         value, slot = result["value"], result["context"]["slot"]
+                        last_slot = max(last_slot or 0, slot)
                         if not any(line == "Program log: Instruction: MigrationDammV2" for line in value.get("logs", [])):
                             continue
                         sig = value["signature"]

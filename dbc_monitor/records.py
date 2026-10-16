@@ -210,7 +210,7 @@ def derive(captures, *, source="mainnet_capture", max_age=120):
                 if reason in ("pool_account_unavailable", "unbound_pool_snapshot"):
                     verdict = "NO_CONCLUSION"
                 emit(c, **base, verdict=verdict, reason=reason)
-        elif kind in ("gap", "rpc_error", "decode_error", "slot_conflict"):
+        elif kind in ("gap", "rpc_error", "decode_error", "slot_conflict", "recovery_report"):
             emit(c, reason=c.get("reason", kind), details={k:v for k,v in c.items()
                  if k not in ("capture_version", "sequence", "observed_at")})
     return result

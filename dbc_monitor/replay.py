@@ -51,7 +51,7 @@ def build(directory, *, source="mainnet_capture", max_age=120):
         commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, stderr=subprocess.DEVNULL, text=True).strip()
     except (OSError, subprocess.CalledProcessError):
         commit = "unavailable"
-    manifest = {"manifest_version": "1.0", "source": source, "software_version": "0.2.0", "git_commit": commit,
+    manifest = {"manifest_version": "1.0", "source": source, "software_version": "0.3.0", "git_commit": commit,
                 "code_sha256": code_hash(), "schema_sha256": digest(SCHEMA), "max_age_seconds": max_age,
                 "started_at": captures[0]["observed_at"], "ended_at": captures[-1]["observed_at"],
                 "configuration": captures[0], "run_result": captures[-1],

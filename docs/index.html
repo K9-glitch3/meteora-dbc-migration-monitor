@@ -9,13 +9,13 @@
 </head>
 <body>
 <header><a class="brand" href="./"><img src="project-mark.png" alt="" width="44" height="44"><span>DBC Migration Monitor<small>Meteora / Solana</small></span></a>
-<nav aria-label="Project links"><a href="updates.html">Build updates</a><a href="https://github.com/K9-glitch3/meteora-dbc-migration-monitor">GitHub</a><a href="https://youtu.be/Ua_gKoqmOn8">Demo</a></nav></header>
+<nav aria-label="Project links"><a href="monitor.html">Watchlist</a><a href="pilot.html">Developer pilot</a><a href="updates.html">Build updates</a><a href="https://github.com/K9-glitch3/meteora-dbc-migration-monitor">GitHub</a></nav></header>
 <main>
 <div class="page-heading"><div><p class="eyebrow">Evidence explorer <span>v0.2</span></p><h1>Migration observations</h1></div><label>Dataset<select id="dataset" aria-label="Dataset"></select></label></div>
 <div id="status" role="status">Loading evidence...</div>
 <section class="run-band" aria-label="Run information"><div><span class="label">Source</span><strong id="source">Pending</strong></div><div><span class="label">Recorded</span><strong id="recorded">Pending</strong></div><div><span class="label">Duration</span><strong id="duration">Pending</strong></div><div><span class="label">Evidence</span><a id="manifest" href="#">Manifest</a> <a id="capture" href="#">Raw capture</a></div></section>
 <section class="stats" aria-label="Run totals"><div><span>Finalized migrations</span><strong id="migration-count">0</strong></div><div><span>Pool state observations</span><strong id="pool-count">0</strong></div><div><span>Distinct pools</span><strong id="distinct-count">0</strong></div><div><span>Health observations</span><strong id="health-count">0</strong></div></section>
-<div class="scope-note"><strong>Comparison scope: migration identity.</strong> Pool prices are exact ratios derived from captured state. Swap quotes have not been independently compared. Account updates marked confirmed may not be finalized.</div>
+<div class="scope-note"><strong>This explorer's comparison scope: migration identity.</strong> Pool prices here are exact ratios derived from captured state. The separate <a href="api/v1/quotes.json">v0.3 quote report</a> compares supported static-fee snapshots against Meteora's SDK. Account updates marked confirmed may not be finalized.</div>
 <section class="timeline" aria-label="Activity timeline"><div class="section-title"><h2>Recorded activity</h2><span id="timeline-label"></span></div><canvas id="activity" height="88" aria-label="Observations by capture time"></canvas></section>
 <section class="workspace" aria-labelledby="observations-title">
 <div class="section-title"><h2 id="observations-title">Observations</h2><span id="count"></span></div>

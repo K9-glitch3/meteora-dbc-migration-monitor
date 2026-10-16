@@ -16,10 +16,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-fund
       - run: python -m pip install .
       - run: python -m unittest discover -s tests -v
       - run: python scripts/check_evidence.py
       - run: node --check docs/explorer.js
+      - run: node --check docs/monitor.js
+      - run: python scripts/check_pilot.py
       - run: python -m dbc_monitor aggregate evidence/stream_vs_chain_20261001.json
       - name: Verify installable package
         run: python -m pip wheel . --no-deps --wheel-dir dist

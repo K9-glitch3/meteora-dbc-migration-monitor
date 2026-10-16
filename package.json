@@ -1,0 +1,11 @@
+{
+  "name": "dbc-monitor-reference-checks",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Pinned official Meteora SDK reference checks, never transaction submission",
+  "devDependencies": {
+    "@meteora-ag/cp-amm-sdk": "1.5.1",
+    "@meteora-ag/dynamic-bonding-curve-sdk": "2.0.0"
+  },
+  "overrides": { "toml": "4.2.0", "jayson": "5.0.0" }
+}

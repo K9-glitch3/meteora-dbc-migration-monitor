@@ -1,0 +1,47 @@
+name: Developer pilot feedback
+description: Report integration experience or a confusing migration observation
+title: "[Pilot] "
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you for trying the read-only pilot. Do not include keys, private RPC URLs, customer information or wallet secrets."
+  - type: input
+    id: run
+    attributes:
+      label: Source run or release
+    validations:
+      required: true
+  - type: input
+    id: public_reference
+    attributes:
+      label: Public transaction or pool
+  - type: textarea
+    id: experience
+    attributes:
+      label: What did you try, expect and observe?
+    validations:
+      required: true
+  - type: input
+    id: time
+    attributes:
+      label: Approximate integration time and biggest obstacle
+  - type: dropdown
+    id: usage
+    attributes:
+      label: Integration status
+      options:
+        - Browsed the explorer only
+        - Consumed the read API in my own code
+        - Replayed the captured evidence
+        - Returned on a second date
+  - type: textarea
+    id: followup
+    attributes:
+      label: What would make this useful again? (Include dates for repeat use.)
+  - type: checkboxes
+    id: public
+    attributes:
+      label: Public sharing
+      options:
+        - label: I understand this issue is public and have removed secrets.
+          required: true

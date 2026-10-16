@@ -1,6 +1,25 @@
 # Architecture and evidence boundaries
 
-## Public v0.2 pipeline
+## Public v0.3 additions
+
+Offline quote arithmetic in quotes.py is checked against a separately executed,
+pinned official SDK. Node dependencies are development-only and never loaded by
+the collector or browser. Separate reports preserve the original identity verdicts.
+
+The readiness sampler discovers a bounded set of active accounts, then captures
+pool/config pairs in one finalized RPC context. The SDK decoder only decodes
+captured bytes. lifecycle.py classifies observations without predicting migrations.
+
+build_feed.py derives the public recorded JSON API from frozen evidence. The
+browser watchlist keeps addresses/activity locally, deduplicates stage alerts,
+exposes stale timestamps and links back to evidence. No backend receives watchlists.
+
+recovery.py adds budgeted finalized signature/transaction backfill after reconnect.
+It distinguishes unfinished history from a reached boundary and retries seen but
+unfinalized candidates. It does not recover arbitrary account-update history or
+prove complete network coverage. See SUPPORTED_SCOPE.md and DEPENDENCIES.md.
+
+## Historical public v0.2 pipeline
 1. Confirmed DBC logs identify candidate migrations, not proven migrations.
 2. A bounded worker retrieves finalized transactions, preserving raw responses.
 3. Supported top-level and CPI instructions are decoded and their roles checked.

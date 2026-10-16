@@ -4,9 +4,13 @@
 [Build updates](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/updates.html) |
 [CI](https://github.com/K9-glitch3/meteora-dbc-migration-monitor/actions/workflows/ci.yml)
 
-Read-only developer tooling for Meteora DBC migrations to DAMM v2. Version 0.2
-adds bounded Solana collection, transaction-level evidence, deterministic replay
-and an interactive evidence explorer.
+Read-only developer tooling for Meteora DBC migrations to DAMM v2. Version 0.3
+adds supported same-state SDK quote comparisons, sampled migration readiness,
+a browser-local watchlist, recorded read API and bounded finalized-history recovery.
+
+[Open watchlist](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/monitor.html) |
+[Developer pilot](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/pilot.html) |
+[Read API](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/api/v1/feed.json)
 
 ## Implemented
 - Versioned JSON observations: source, slot, commitment, freshness, verdict,
@@ -23,7 +27,33 @@ and an interactive evidence explorer.
 **Scope:** in the new schema, `SUPPORTED_COMPARISON` means a fresh finalized
 **migration identity** matched its notification and supported instruction.
 It does not mean a swap quote, profitable trade or secure token. Pool prices
-are atomic-unit ratios, not independently verified swap quotes.
+are atomic-unit ratios. A separate v0.3 report compares a deliberately narrow
+static-fee, standard-SPL, concentrated-liquidity quote scope with the official SDK
+on identical captured bytes. This is not an external audit or execution evidence.
+
+## Developer workflow and reference checks
+
+The watchlist supports browser-local saved addresses, stage filters, evidence links
+and recorded activity. The versioned public API is a manually refreshed snapshot,
+not a continuous hosted stream. It reports capture timestamps and stale data.
+No background email/push/webhook alerts or uptime SLA are offered in this pilot.
+
+```powershell
+python examples/read_feed.py
+npm ci --ignore-scripts
+python scripts/compare_quotes.py evidence/mainnet-2026-10-16/capture.jsonl runs/quotes.json
+python scripts/capture_readiness.py runs/readiness.json
+```
+
+Read [dependency limitations](docs/DEPENDENCIES.md) before installing the offline
+reference SDKs. Five high-severity dependency nodes remain flagged through the
+unpatched bigint-buffer native-addon dependency. No Node SDK is loaded by the
+browser or Python collector. Do not enable native builds or expose this tooling
+as a public service.
+
+See the [pilot contract](docs/PILOT.md) and [independent review brief](docs/REVIEW_SCOPE.md).
+Three invitations and a review enquiry have been sent; acceptance, integration,
+repeat use and independent validation remain unconfirmed.
 
 ## Install and verify
 Python 3.10 or later:

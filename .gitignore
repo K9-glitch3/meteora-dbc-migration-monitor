@@ -9,3 +9,4 @@ build/
 runs/
 .env
 playwright-results/
+node_modules/
