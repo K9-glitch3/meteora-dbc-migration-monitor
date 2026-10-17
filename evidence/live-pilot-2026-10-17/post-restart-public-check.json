@@ -1,0 +1,229 @@
+{
+  "checked_at": "2026-10-17T02:55:39.864736+00:00",
+  "endpoint": "https://retailer-succeed-yen-modeling.trycloudflare.com",
+  "scope": "bounded public API progress and retained hash checks; not complete coverage or uptime",
+  "seconds": 60,
+  "samples": [
+    {
+      "health": {
+        "complete_coverage": false,
+        "connected": true,
+        "counters": {
+          "duplicates": 0,
+          "log_notifications": 346,
+          "migration_candidates": 1,
+          "pool_notifications": 0,
+          "queue_overflows": 0,
+          "reconnects": 0,
+          "rpc_errors": 0
+        },
+        "epoch": "516ec5a8cf474ab492bced571e4b65c1",
+        "generated_at": "2026-10-17T02:54:39.092078Z",
+        "heartbeat_at": "2026-10-17T02:54:33.926826Z",
+        "last_message_at": "2026-10-17T02:54:30.923622Z",
+        "last_slot": 457877687,
+        "pending": 0,
+        "recovery": "bounded migration backfill; pool-update gaps cannot be reconstructed",
+        "retention_captures": 20000,
+        "started_at": "2026-10-17T02:53:36.160084Z",
+        "status": "live",
+        "subscribed": true
+      },
+      "migrations": 13,
+      "pool_states": 20,
+      "readiness": 1,
+      "readiness_status": "sampled"
+    },
+    {
+      "health": {
+        "complete_coverage": false,
+        "connected": true,
+        "counters": {
+          "duplicates": 0,
+          "log_notifications": 349,
+          "migration_candidates": 2,
+          "pool_notifications": 0,
+          "queue_overflows": 0,
+          "reconnects": 0,
+          "rpc_errors": 0
+        },
+        "epoch": "516ec5a8cf474ab492bced571e4b65c1",
+        "generated_at": "2026-10-17T02:54:49.201217Z",
+        "heartbeat_at": "2026-10-17T02:54:45.644399Z",
+        "last_message_at": "2026-10-17T02:54:45.603820Z",
+        "last_slot": 457877757,
+        "pending": 1,
+        "recovery": "bounded migration backfill; pool-update gaps cannot be reconstructed",
+        "retention_captures": 20000,
+        "started_at": "2026-10-17T02:53:36.160084Z",
+        "status": "live",
+        "subscribed": true
+      },
+      "migrations": 14,
+      "pool_states": 20,
+      "readiness": 1,
+      "readiness_status": "sampled"
+    },
+    {
+      "health": {
+        "complete_coverage": false,
+        "connected": true,
+        "counters": {
+          "duplicates": 0,
+          "log_notifications": 463,
+          "migration_candidates": 2,
+          "pool_notifications": 0,
+          "queue_overflows": 0,
+          "reconnects": 0,
+          "rpc_errors": 0
+        },
+        "epoch": "516ec5a8cf474ab492bced571e4b65c1",
+        "generated_at": "2026-10-17T02:54:59.278880Z",
+        "heartbeat_at": "2026-10-17T02:54:56.062256Z",
+        "last_message_at": "2026-10-17T02:54:56.062220Z",
+        "last_slot": 457877807,
+        "pending": 0,
+        "recovery": "bounded migration backfill; pool-update gaps cannot be reconstructed",
+        "retention_captures": 20000,
+        "started_at": "2026-10-17T02:53:36.160084Z",
+        "status": "degraded",
+        "subscribed": true
+      },
+      "migrations": 14,
+      "pool_states": 20,
+      "readiness": 1,
+      "readiness_status": "sampled"
+    },
+    {
+      "health": {
+        "complete_coverage": false,
+        "connected": true,
+        "counters": {
+          "duplicates": 0,
+          "log_notifications": 596,
+          "migration_candidates": 2,
+          "pool_notifications": 2,
+          "queue_overflows": 0,
+          "reconnects": 0,
+          "rpc_errors": 2
+        },
+        "epoch": "516ec5a8cf474ab492bced571e4b65c1",
+        "generated_at": "2026-10-17T02:55:09.361853Z",
+        "heartbeat_at": "2026-10-17T02:55:06.265016Z",
+        "last_message_at": "2026-10-17T02:55:06.264972Z",
+        "last_slot": 457877854,
+        "pending": 0,
+        "recovery": "bounded migration backfill; pool-update gaps cannot be reconstructed",
+        "retention_captures": 20000,
+        "started_at": "2026-10-17T02:53:36.160084Z",
+        "status": "degraded",
+        "subscribed": true
+      },
+      "migrations": 14,
+      "pool_states": 20,
+      "readiness": 1,
+      "readiness_status": "sampled"
+    },
+    {
+      "health": {
+        "complete_coverage": false,
+        "connected": true,
+        "counters": {
+          "duplicates": 0,
+          "log_notifications": 886,
+          "migration_candidates": 2,
+          "pool_notifications": 2,
+          "queue_overflows": 0,
+          "reconnects": 0,
+          "rpc_errors": 4
+        },
+        "epoch": "516ec5a8cf474ab492bced571e4b65c1",
+        "generated_at": "2026-10-17T02:55:19.465693Z",
+        "heartbeat_at": "2026-10-17T02:55:16.685572Z",
+        "last_message_at": "2026-10-17T02:55:16.685532Z",
+        "last_slot": 457877901,
+        "pending": 0,
+        "recovery": "bounded migration backfill; pool-update gaps cannot be reconstructed",
+        "retention_captures": 20000,
+        "started_at": "2026-10-17T02:53:36.160084Z",
+        "status": "degraded",
+        "subscribed": true
+      },
+      "migrations": 14,
+      "pool_states": 20,
+      "readiness": 1,
+      "readiness_status": "sampled"
+    },
+    {
+      "health": {
+        "complete_coverage": false,
+        "connected": true,
+        "counters": {
+          "duplicates": 0,
+          "log_notifications": 1117,
+          "migration_candidates": 2,
+          "pool_notifications": 2,
+          "queue_overflows": 0,
+          "reconnects": 0,
+          "rpc_errors": 6
+        },
+        "epoch": "516ec5a8cf474ab492bced571e4b65c1",
+        "generated_at": "2026-10-17T02:55:29.559324Z",
+        "heartbeat_at": "2026-10-17T02:55:26.915009Z",
+        "last_message_at": "2026-10-17T02:55:26.914940Z",
+        "last_slot": 457877949,
+        "pending": 0,
+        "recovery": "bounded migration backfill; pool-update gaps cannot be reconstructed",
+        "retention_captures": 20000,
+        "started_at": "2026-10-17T02:53:36.160084Z",
+        "status": "degraded",
+        "subscribed": true
+      },
+      "migrations": 14,
+      "pool_states": 20,
+      "readiness": 1,
+      "readiness_status": "degraded"
+    },
+    {
+      "health": {
+        "complete_coverage": false,
+        "connected": true,
+        "counters": {
+          "duplicates": 0,
+          "log_notifications": 1427,
+          "migration_candidates": 2,
+          "pool_notifications": 2,
+          "queue_overflows": 0,
+          "reconnects": 0,
+          "rpc_errors": 8
+        },
+        "epoch": "516ec5a8cf474ab492bced571e4b65c1",
+        "generated_at": "2026-10-17T02:55:39.059735Z",
+        "heartbeat_at": "2026-10-17T02:55:37.256962Z",
+        "last_message_at": "2026-10-17T02:55:37.256925Z",
+        "last_slot": 457877997,
+        "pending": 0,
+        "recovery": "bounded migration backfill; pool-update gaps cannot be reconstructed",
+        "retention_captures": 20000,
+        "started_at": "2026-10-17T02:53:36.160084Z",
+        "status": "degraded",
+        "subscribed": true
+      },
+      "migrations": 14,
+      "pool_states": 20,
+      "readiness": 1,
+      "readiness_status": "degraded"
+    }
+  ],
+  "verified_evidence_ids": [
+    "4876f6d592e2e873ef4e7eff63bf62a2949f423410df7de402c04e56fd3a5b70",
+    "9e06eb33861c667232096c641aaefa787cb610dd03aae5efb7320cc973221ea1",
+    "75fb24b4d769b0d94ce28763b9dc619c5f4bc08537497d40523b7cb9f02798a7",
+    "69f6bfa15148bfc11bf24a7cc1bd297158d9063ed955323d89aea7a275b8fcbc",
+    "31ae198140bc5ccf7e17069c0cccf1f121db12428e6473b9757ebd86e7de4070",
+    "3875f4d59789b68dcf97e0261dc0d8107d1173fef5e43f2fb91c16c470e4dc8d",
+    "028060669a964223dea605d80b4ad54552f5007cda5b1278aabeeefaeb6ab012",
+    "1ed34c8354b0db7ae51168d81adc537503b15ec53461e5c3f9809e8ee70ac047",
+    "85b715b984911861f7682cac2d2ed41a0f19c0716f7f6c117ec0d5ec7f1f2abf"
+  ]
+}

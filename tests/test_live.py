@@ -116,6 +116,12 @@ class LiveTests(unittest.TestCase):
         feed["health"]["heartbeat_at"]="2020-01-01T00:00:00Z"
         self.assertTrue(summarize(feed)["stale"])
 
+    def test_supervisor_status_lock_does_not_stop_service(self):
+        from scripts.supervise_live import write_status
+        with patch("pathlib.Path.replace",side_effect=PermissionError("locked")):
+            self.assertEqual(write_status(Path(self.temp.name),{"test":True}),"PermissionError")
+        self.assertIsNone(write_status(Path(self.temp.name),{"test":True}))
+
     def test_api_allowlist_cors_cache_and_no_write_routes(self):
         server=api_server(self.j,0)
         thread=threading.Thread(target=server.serve_forever,daemon=True)

@@ -54,17 +54,25 @@ function render(manual=false) {
   const pages=Math.max(1,Math.ceil(rows.length/25));page=Math.min(page,pages-1);$('migration-rows').replaceChildren();
   for(const r of rows.slice(page*25,(page+1)*25)) { const tr=el('tr');cell(tr,r.observed_at.slice(11,19));const identity=el('div');identity.append(accountLink(r.pool),el('br'),el('code',short(r.signature)));cell(tr,identity);cell(tr,el('span',r.stage,'stage-pill '+r.stage));cell(tr,r.reason.replaceAll('_',' '));const detail=el('button','Inspect');detail.onclick=()=>openDetail(r);cell(tr,detail);cell(tr,watchButton(r.pool||r.virtual_pool));$('migration-rows').append(tr); }
   $('migration-count').textContent=rows.length+(rows.length===1?' observation':' observations');$('migration-empty').hidden=rows.length!==0;$('page').textContent='Page '+(page+1)+' of '+pages;$('previous').disabled=page===0;$('next').disabled=page>=pages-1;
+  const events=Array.isArray(feed.health_events)?feed.health_events:[];
+  $('health-events').replaceChildren(...events.slice(0,5).map(r=>{
+    const d=r.details||{};
+    const detail=d.kind==='recovery_report'?'Recovery '+(d.complete?'boundary reached':'incomplete')+' / '+(d.unresolved??0)+' unresolved / '+(d.recovered_count??0)+' recovered':r.reason.replaceAll('_',' ');
+    return el('li',r.observed_at+' / '+detail);
+  }));
+  $('health-history').hidden=recordedMode||events.length===0;
   $('alerts').replaceChildren(...alerts.map(a=>el('li',a.text)));$('alerts-empty').hidden=alerts.length!==0;
 }
 function updateStatus() {
   if(!feed || refreshFailed)return;
-  if(recordedMode){$('status').className='error';$('status').textContent='Historical recorded snapshot / not live';return;}
+  if(recordedMode){$('status').className='error';$('status').textContent='Historical recorded snapshot / not live';$('readiness-status').textContent='Historical sample / not a forecast';return;}
   const times=[feed.generated_at,feed.health.heartbeat_at,feed.health.last_message_at];
   const stale=times.some(t=>!Number.isFinite(Date.parse(t))||Date.now()-Date.parse(t)>30000||Date.parse(t)-Date.now()>5000);
   const status=stale?'stale':feed.health.status;
   $('status').className=status==='live'?'':'error';
   $('status').textContent=(status==='live'?'Live mainnet stream':status.toUpperCase()+' / coverage impaired')+' / slot '+(feed.health.last_slot??'pending')+' / '+(feed.health.counters.log_notifications??0)+' log notifications / '+(feed.health.pending??0)+' awaiting finality';
-  $('readiness-status').textContent='Sampled / '+(Date.now()-Date.parse(feed.readiness_recorded_until)>180000?'stale':feed.readiness_status)+' / not a forecast';
+  const readinessState=Date.now()-Date.parse(feed.readiness_recorded_until)>180000?'stale':feed.readiness_status;
+  $('readiness-status').textContent=(readinessState==='sampled'?'Current sample':'Sample '+readinessState)+' / not a forecast';
 }
 async function refresh() {
   if(refreshing)return;

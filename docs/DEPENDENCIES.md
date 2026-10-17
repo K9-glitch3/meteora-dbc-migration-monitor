@@ -29,8 +29,8 @@ Run npm ci --ignore-scripts, node scripts/check_bigint.cjs, npm audit,
 and python scripts/check_pilot.py. On 17 October 2026, clean installation and
 npm audit report zero known advisories. There are 212 valid conversion/layout
 cases plus negative controls. All 120 previously published quote cases and
-readiness decoder checks still pass, with unchanged case outputs. Only the
-lockfile provenance changed in the quote reports.
+readiness decoder checks still pass, with unchanged case outputs. The quote
+reports carry the new lockfile provenance and the adapter source hash.
 
 This removes the identified dependency path; it does not establish that the
 SDKs, adapter or monitor are vulnerability-free or independently audited.

@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-10-17T02:53:36.3323072Z",
+  "prior_epoch": "f30abfd390284cee81440097382c8a54",
+  "endpoint_unchanged": true,
+  "collector_restarted": true,
+  "starts": {
+    "collector": 2,
+    "tunnel": 1
+  }
+}

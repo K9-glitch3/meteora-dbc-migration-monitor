@@ -64,11 +64,12 @@ and verify its release digest. The deployed binary is 2026.10.1:
 
 The deployed command is:
 
-    runs/live-venv/Scripts/python.exe scripts/supervise_live.py --publish
+    runs/live-venv/Scripts/python.exe scripts/supervise_live.py --publish --data "%LOCALAPPDATA%/DBCMonitor/live"
 
 The supervisor restarts only its own collector/tunnel children, with a 30-second
 minimum restart interval and a single-instance lock. State and bounded logs:
-runs/live/supervisor-status.json. A current-user Startup shortcut restarts it
+%LOCALAPPDATA%/DBCMonitor/live/supervisor-status.json. Runtime state is outside
+the OneDrive-synced source folder. A current-user Startup shortcut restarts it
 after login. No system power policy, firewall rule, trading process or other
 session is modified.
 
@@ -78,7 +79,13 @@ in this repository. Attempts are limited to once per five minutes. GitHub Pages
 deployment can cause additional recovery delay. A failed publication is visible
 as publish_error, not silently counted as successful.
 
-To stop, create runs/live/STOP. The supervisor terminates only its owned children.
+To stop, create %LOCALAPPDATA%/DBCMonitor/live/STOP. The supervisor terminates only its owned children.
 Remove that file before restarting. Remove the DBC Live Monitor shortcut from
 the current user's Startup folder to disable login startup. Do not terminate
 unrelated Python, Node, browser or trading processes.
+
+On this Codex desktop installation, Windows resolves the runtime directory to
+the user's AppData/Local/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/DBCMonitor/live folder.
+The installed shortcut uses that absolute path, so startup does not depend on
+the launching application's LOCALAPPDATA mapping. Status-file sharing errors
+are retried without stopping the collector.

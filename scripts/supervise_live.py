@@ -12,6 +12,7 @@ import sys
 import threading
 import time
 from urllib.request import urlopen
+from urllib.error import URLError
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "K9-glitch3/meteora-dbc-migration-monitor"
@@ -61,6 +62,8 @@ def run(data, tunnel, publish_enabled):
     published, last_publish, restarts = None, 0, {"collector": 0, "tunnel": 0}
     last_start = {"collector": 0, "tunnel": 0}
     status_error = None
+    status_write_error = None
+    log_lock = threading.Lock()
 
     def start(name, command):
         process = subprocess.Popen(command, cwd=ROOT, stdin=subprocess.DEVNULL,
@@ -68,7 +71,8 @@ def run(data, tunnel, publish_enabled):
                                    encoding="utf-8", errors="replace", creationflags=FLAGS)
         def read():
             for line in process.stdout:
-                tails[name].append(line[-2000:].rstrip())
+                with log_lock:
+                    tails[name].append(line[-2000:].rstrip())
                 if name == "tunnel":
                     match = ENDPOINT.search(line)
                     if match:
@@ -94,27 +98,51 @@ def run(data, tunnel, publish_enabled):
                 try:
                     if publish(endpoint[0]):
                         published, status_error = endpoint[0], None
+                    else:
+                        last_publish = time.monotonic() - 270
+                except URLError as exc:
+                    status_error = type(exc).__name__
+                    last_publish = time.monotonic() - 270
                 except Exception as exc:
                     status_error = type(exc).__name__
+            with log_lock:
+                logs = {k: list(v) for k,v in tails.items()}
             status = {"supervisor_pid": os.getpid(), "updated_at_unix": time.time(), "endpoint": endpoint[0],
                       "published_endpoint": published, "publish_error": status_error,
+                      "status_write_error": status_write_error,
                       "pids": {k: v.pid for k,v in children.items()}, "starts": restarts,
                       "exit_codes": {k: v.poll() for k,v in children.items()},
-                      "logs": {k: list(v) for k,v in tails.items()}}
-            pending = data/"supervisor-status.tmp"
-            pending.write_text(json.dumps(status, indent=2), encoding="utf-8")
-            pending.replace(data/"supervisor-status.json")
+                      "logs": logs}
+            status_write_error = write_status(data, status)
             time.sleep(2)
     finally:
         for process in children.values():
             if process.poll() is None:
-                process.terminate()
+                if os.name == "nt":
+                    # Windows venv launchers can own a second Python process.
+                    # Terminate only this child's tree, never all Python processes.
+                    subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                                   capture_output=True, timeout=15, creationflags=FLAGS)
+                else:
+                    process.terminate()
         for process in children.values():
             try:
                 process.wait(timeout=10)
             except subprocess.TimeoutExpired:
                 process.kill();process.wait(timeout=10)
         lock.close()
+
+
+def write_status(data, status):
+    # Windows readers/AV/sync clients can briefly deny an atomic rename.
+    # Reporting failure must never tear down the actual feed.
+    try:
+        pending = data/"supervisor-status.tmp"
+        pending.write_text(json.dumps(status, indent=2), encoding="utf-8")
+        pending.replace(data/"supervisor-status.json")
+        return None
+    except OSError as exc:
+        return type(exc).__name__
 
 
 if __name__ == "__main__":
