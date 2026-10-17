@@ -1,0 +1,15 @@
+{
+  "started_at": "2026-10-17T03:13:04.809425+00:00",
+  "endpoint": "https://dbc-monitor.188-166-88-35.sslip.io",
+  "security_limits_verified": true,
+  "collector_image": "sha256:35dff2dc1692b89580c103dbdc20c151877d91fed32ae6aa8f589646f44a3c26",
+  "proxy_image": "sha256:f46cef0a92efd9238b8340d3579b6d2e89a746e308b998145b81c5aa77fdb6f5",
+  "restart_exercised": true,
+  "epoch_before": "6c35c2518f294c95802ca2ca06c4db76",
+  "epoch_after": "6c37dd56da6142469eaf65e3c54c7526",
+  "retained_evidence_id": "b1b57b6117d7c105fe6d7638ed32e5adf96675bb17b496832ff7d3aff98e4d97",
+  "retained_evidence_unchanged": true,
+  "restart_count": 1,
+  "other_containers_unchanged": true,
+  "finished_at": "2026-10-17T03:13:19.080121+00:00"
+}

@@ -38,7 +38,7 @@ renewed Let's Encrypt TLS. It stays the same while the server IP stays the same.
 This reuses an already-paid server, not a new free-tier subscription.
 Third-party DNS, host, disk, certificate, network and public-RPC failures can still
 interrupt availability. There is no uptime SLA, redundant host or failover.
-The server was already 96% full before installation; approximately 4.4 GiB remained
+The server was already 96% full before installation; approximately 4.1 GiB remained
 after deployment. No unrelated data or services were removed. Disk capacity needs
 operator attention independently of this bounded service.
 

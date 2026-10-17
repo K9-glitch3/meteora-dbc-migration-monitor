@@ -1,0 +1,48 @@
+{
+  "checked_at": "2026-10-17T03:14:27.518332+00:00",
+  "endpoint": "https://dbc-monitor.188-166-88-35.sslip.io",
+  "tls_verified": true,
+  "http_redirects_to_https": true,
+  "checks": [
+    {
+      "method": "GET",
+      "path": "/healthz",
+      "status": 200
+    },
+    {
+      "method": "HEAD",
+      "path": "/v1/feed.json",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/.env",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/etc/passwd",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/config/",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/?url=https://example.com",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "path": "/v1/feed.json",
+      "status": 501
+    }
+  ]
+}
