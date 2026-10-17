@@ -1,0 +1,42 @@
+name: dbc-monitor
+services:
+  collector:
+    image: dbc-monitor:0.4.1
+    build:
+      context: ..
+    restart: unless-stopped
+    init: true
+    read_only: true
+    user: "65532:65532"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 0.50
+    pids_limit: 96
+    stop_grace_period: 40s
+    tmpfs: ["/tmp:size=32m,noexec,nosuid"]
+    volumes: ["/var/lib/dbc-monitor:/data"]
+    logging:
+      driver: json-file
+      options: {max-size: "1m", max-file: "3"}
+  proxy:
+    image: dbc-monitor-proxy:0.4.1
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+    restart: unless-stopped
+    read_only: true
+    user: "65532:65532"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    cpus: 0.25
+    pids_limit: 64
+    ports: ["80:8080", "443:8443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /var/lib/dbc-monitor-tls:/data
+    tmpfs: ["/config:size=4m,noexec,nosuid", "/tmp:size=4m,noexec,nosuid"]
+    logging:
+      driver: json-file
+      options: {max-size: "1m", max-file: "3"}

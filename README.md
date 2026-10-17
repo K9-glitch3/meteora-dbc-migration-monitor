@@ -8,7 +8,10 @@
 Read-only developer tooling for Meteora DBC migrations to DAMM v2. Version 0.4
 adds a continuous mainnet collector, public live JSON API, five-second browser
 refresh, separate freshness/health indicators, and bounded durable retention.
-This is a PC-hosted, best-effort pilot, not an independently hosted uptime service.
+Version 0.4.1 runs continuously on an independent remote server, with persistent
+storage, automatic restart and HTTPS. It does not need my PC or browser to remain
+on. This reuses existing paid hosting without a new subscription; no uptime SLA
+or complete chain coverage is claimed.
 
 [Open watchlist](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/monitor.html) |
 [Developer pilot](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/pilot.html) |

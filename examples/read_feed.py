@@ -7,6 +7,18 @@ from urllib.request import urlopen
 DEFAULT = "https://k9-glitch3.github.io/meteora-dbc-migration-monitor/live-config.json"
 
 
+def live_endpoint(config):
+    from urllib.parse import urlsplit
+    endpoint = urlsplit(config.get("endpoint", ""))
+    host = endpoint.hostname or ""
+    allowed = host == "dbc-monitor.188-166-88-35.sslip.io" or host.endswith(".trycloudflare.com")
+    if (not config.get("enabled") or endpoint.scheme != "https" or not allowed
+            or endpoint.username or endpoint.password or endpoint.port
+            or endpoint.path not in ("", "/") or endpoint.query or endpoint.fragment):
+        raise ValueError("Live endpoint unavailable")
+    return config["endpoint"].rstrip("/") + "/v1/feed.json"
+
+
 def summarize(feed, address=None):
     contract = (feed.get("api_version"), feed.get("mode"))
     if contract not in (("1.0", "recorded_snapshot"), ("2.0", "continuous_live")):
@@ -36,13 +48,9 @@ def summarize(feed, address=None):
 if __name__ == "__main__":
     p=argparse.ArgumentParser();p.add_argument("--url",default=DEFAULT);p.add_argument("--address");a=p.parse_args()
     if a.url==DEFAULT:
-        from urllib.parse import urlsplit
         with urlopen(DEFAULT,timeout=20) as response:
             config=json.loads(response.read(10000))
-        endpoint=urlsplit(config.get("endpoint",""))
-        if not config.get("enabled") or endpoint.scheme!="https" or not endpoint.hostname.endswith(".trycloudflare.com") or endpoint.username or endpoint.password or endpoint.port:
-            raise ValueError("Live endpoint unavailable")
-        a.url=config["endpoint"].rstrip("/")+"/v1/feed.json"
+        a.url=live_endpoint(config)
     with urlopen(a.url,timeout=20) as response:
         raw=response.read(5_000_001)
     if len(raw)>5_000_000:raise ValueError("Feed exceeds limit")

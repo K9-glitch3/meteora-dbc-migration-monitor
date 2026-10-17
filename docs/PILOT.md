@@ -42,7 +42,7 @@ Browser activity records watched matches and newly observed stages when the page
 refreshes the live API. Initial observations say "Existing feed match". Clearing
 activity does not establish a new on-chain state. There is no email, push or webhook
 delivery and no browser alerts after closing the page. The collector continues
-independently of browser tabs while its host PC is running. No uptime SLA applies.
+on an independent remote server even when my PC is off. No uptime SLA applies.
 The browser polls every five seconds, independently of continuous RPC collection.
 Upstream silence becomes stale after 30 seconds. Readiness is resampled separately.
 

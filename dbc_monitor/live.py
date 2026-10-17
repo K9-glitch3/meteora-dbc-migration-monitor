@@ -164,7 +164,9 @@ class LiveJournal:
             self.db.close()
 
 
-def api_server(journal, port=8898):
+def api_server(journal, port=8898, host="127.0.0.1"):
+    if host not in ("127.0.0.1", "0.0.0.0"):
+        raise ValueError("Unsupported API bind address")
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.0"
 
@@ -202,14 +204,14 @@ def api_server(journal, port=8898):
         do_HEAD = do_GET
 
     # Sequential, short requests bound worker usage. Only this JSON API is exposed.
-    return HTTPServer(("127.0.0.1", port), Handler)
+    return HTTPServer((host, port), Handler)
 
 
-async def serve(directory, port=8898, readiness_capture=None):
+async def serve(directory, port=8898, readiness_capture=None, host="127.0.0.1"):
     root = Path(directory)
     root.mkdir(parents=True, exist_ok=True)
     journal = LiveJournal(root / "live.sqlite3")
-    server = api_server(journal, port)
+    server = api_server(journal, port, host)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
 

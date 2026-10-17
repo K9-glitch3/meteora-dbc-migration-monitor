@@ -83,7 +83,8 @@ async function refresh() {
       if(!response.ok)throw new Error('Live endpoint configuration unavailable');
       const config=await response.json();
       const endpoint=new URL(config.endpoint);
-      if(!config.enabled||endpoint.protocol!=='https:'||endpoint.username||endpoint.password||endpoint.port||!endpoint.hostname.endsWith('.trycloudflare.com'))throw new Error('Live endpoint unavailable');
+      const allowedHost=endpoint.hostname==='dbc-monitor.188-166-88-35.sslip.io'||endpoint.hostname.endsWith('.trycloudflare.com');
+      if(!config.enabled||endpoint.protocol!=='https:'||endpoint.username||endpoint.password||endpoint.port||!allowedHost||endpoint.pathname!=='/'||endpoint.search||endpoint.hash)throw new Error('Live endpoint unavailable');
       apiBase=endpoint.origin;
     }
     const url=recordedMode?'api/v1/feed.json':apiBase+'/v1/feed.json';

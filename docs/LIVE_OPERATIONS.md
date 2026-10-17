@@ -1,4 +1,4 @@
-# Continuous live pilot / v0.4
+# Independently hosted continuous pilot / v0.4.1
 
 ## Architecture
 
@@ -8,9 +8,10 @@ It does not finish after a timed capture. The first four discovered DAMM pools
 receive account subscriptions; all supported detected migrations receive an
 initial pool snapshot. This is not a subscription to every pool on Solana.
 
-SQLite stores bounded raw evidence and observations. The API binds only to
-127.0.0.1:8898. A Cloudflare quick tunnel exposes only that JSON API. The static
-GitHub Pages monitor discovers its HTTPS address from live-config.json and
+SQLite stores bounded raw evidence and observations on the remote server.
+The API binds to 0.0.0.0:8898 only inside its isolated Docker network; it has no
+published host port. A separate unprivileged Caddy container exposes the JSON API
+over HTTPS. The static GitHub Pages monitor discovers its address from live-config.json and
 polls every five seconds while visible. It never silently substitutes historical
 data when the live endpoint fails.
 
@@ -30,11 +31,16 @@ Readiness is an up-to-eight-pool sample repeated 90 seconds after each completed
 sample; it has its own timestamp and becomes stale after 180 seconds.
 It is not full-market discovery, a migration forecast or a continuous account stream.
 
-The service is on Michael's Windows PC, not an independent server. Sleep,
-logout, power, internet, RPC or tunnel failures interrupt availability.
-Cloudflare quick tunnels have no uptime guarantee, a changing hostname and no SSE:
-[official limitations](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/).
-This deployment is a live pilot, not production 24/7 hosting.
+The service is now on an existing DigitalOcean server, independent of Michael's PC.
+Both containers restart automatically after process failure and host boot.
+The hostname is https://dbc-monitor.188-166-88-35.sslip.io, with automatically
+renewed Let's Encrypt TLS. It stays the same while the server IP stays the same.
+This reuses an already-paid server, not a new free-tier subscription.
+Third-party DNS, host, disk, certificate, network and public-RPC failures can still
+interrupt availability. There is no uptime SLA, redundant host or failover.
+The server was already 96% full before installation; approximately 4.4 GiB remained
+after deployment. No unrelated data or services were removed. Disk capacity needs
+operator attention independently of this bounded service.
 
 Recovery is bounded to the existing finalized-signature scan and transaction
 budget. Partial recovery remains explicit in health events. Historical pool
@@ -50,12 +56,49 @@ Existing rows may predate the current process; per-row observation time is retai
 - SQLite database hard limit: 128 MiB; WAL checkpoint every 500 writes.
 - Expired raw evidence returns capture_retained=false; unknown/expired IDs: 404.
 - HTTP request handling is sequential with a three-second connection timeout.
-- Only the latest bounded supervisor output is retained.
+- Collector memory: 512 MiB, 0.5 CPU, 96 processes; proxy: 128 MiB, 0.25 CPU.
+- Container logs: three 1 MB files each. Read-only root filesystems, no Linux
+  capabilities, non-root users, no credentials or wallets, private Docker network.
+- Collector /tmp: 32 MiB; only /data is persistent and writable.
 
 The old frozen evidence under evidence/ is untouched. Live retention is not a
 substitute for those permanent replay archives.
 
-## Run, restart and stop
+## Remote operations
+
+Deployment source is /opt/dbc-monitor; persistent data is /var/lib/dbc-monitor.
+TLS state is /var/lib/dbc-monitor-tls. Both directories belong to UID/GID 65532.
+Base images are pinned by digest. The public proxy has no admin API or file route.
+Deploy from a reviewed checkout, with at least 2 GiB free after image installation:
+
+    docker compose -f deploy/compose.yaml build
+    docker compose -f deploy/compose.yaml up -d --no-build
+    docker compose -f deploy/compose.yaml ps
+
+Restart only this service with:
+
+    docker compose -f deploy/compose.yaml restart collector
+
+Stop only this deployment with:
+
+    docker compose -f deploy/compose.yaml stop
+
+Do not restart the shared host, Docker daemon, or unrelated containers. Automatic
+restart after a killed collector was exercised; a host reboot was not performed.
+Docker health status reports upstream freshness; an unhealthy badge alone does not
+restart a container. Collection reconnects internally; process exits restart.
+Preserve the SQLite directory across redeployments. A consistent SQLite backup,
+not a raw copy of an open database, was used for the initial migration.
+Evidence receipts are in evidence/hosting-2026-10-17.
+
+The old PC collector, tunnel and publishing supervisor are stopped. Its Startup
+shortcut was moved out of Startup, with its database preserved for rollback.
+Do not start the old --publish supervisor without deliberately changing the
+public endpoint back: it can overwrite live-config.json.
+
+## Retired PC pilot (v0.4 historical instructions)
+
+The following describes the retired deployment, not the current live service.
 
 Install the Python package in a dedicated virtual environment and run npm ci
 with install scripts disabled. Download cloudflared from its official releases

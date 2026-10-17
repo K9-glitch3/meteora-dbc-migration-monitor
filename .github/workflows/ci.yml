@@ -5,6 +5,15 @@ on:
 permissions:
   contents: read
 jobs:
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t dbc-monitor:test .
+      - run: docker build -f deploy/Dockerfile.proxy -t dbc-monitor-proxy:test deploy
+      - name: Offline container regression suite
+        run: docker run --rm --network none --read-only --tmpfs /tmp:size=64m --cap-drop ALL --security-opt no-new-privileges --mount type=bind,source=${{ github.workspace }},target=/checkout,readonly -w /checkout dbc-monitor:test python -m unittest discover -s tests -q
+      - run: docker run --rm --network none --read-only --cap-drop ALL --security-opt no-new-privileges dbc-monitor:test node scripts/check_bigint.cjs
   test:
     strategy:
       matrix:
