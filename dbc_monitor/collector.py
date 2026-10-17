@@ -66,11 +66,12 @@ class Journal:
 
 
 async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
-                  max_pools=4, max_events=20000):
+                  max_pools=4, max_events=20000, live_journal=None, resume_slot=None):
     import websockets
     from .protocol import migrations
     from .recovery import recover
-    if not 1 <= seconds <= 3600 or not 1 <= max_pools <= 16 or not 1 <= max_events <= 100000:
+    continuous = live_journal is not None and seconds is None
+    if (not continuous and not 1 <= seconds <= 3600) or not 1 <= max_pools <= 16 or not 1 <= max_events <= 100000:
         raise ValueError("Run duration/capacity outside bounded limits")
     endpoint = endpoint or os.environ.get("DBC_RPC_URL", "https://api.mainnet-beta.solana.com")
     ws_endpoint = ws_endpoint or os.environ.get("DBC_WS_URL", "wss://api.mainnet-beta.solana.com")
@@ -78,14 +79,16 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
         raise ValueError("WebSocket endpoint must use WSS")
     rpc = Rpc(endpoint)
     root = Path(directory)
-    root.mkdir(parents=True, exist_ok=False)
-    journal = Journal(root / "capture.jsonl")
+    if not continuous:
+        root.mkdir(parents=True, exist_ok=False)
+    journal = live_journal if continuous else Journal(root / "capture.jsonl")
     started = monotonic()
-    deadline = started + seconds
+    deadline = float("inf") if continuous else started + seconds
     stats = {"log_notifications": 0, "migration_candidates": 0, "pool_notifications": 0,
              "duplicates": 0, "reconnects": 0, "rpc_errors": 0, "queue_overflows": 0}
-    seen, pools, finalized = {}, set(), set()
-    last_slot = None
+    seen, pools, finalized = {}, set(), {}
+    last_slot = resume_slot
+    last_message_at, last_heartbeat = None, 0
     queue = asyncio.Queue(maxsize=64)
     from .replay import code_hash
     journal.write("run_start", collector_code_sha256=code_hash(), duration_seconds=seconds, max_pools=max_pools,
@@ -127,7 +130,9 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
                 journal.write("transaction", signature=signature, notification_slot=slot,
                               commitment="finalized", result=final)
                 if final is not None and final["slot"] == slot and final["transaction"]["signatures"][0] == signature:
-                    finalized.add(signature)
+                    finalized[signature] = slot
+                    if continuous and len(finalized) > 4096:
+                        del finalized[next(iter(finalized))]
                     await snapshot_pools(final, signature)
             except (ValueError, KeyError, TypeError, IndexError) as exc:
                 journal.write("decode_error", error=type(exc).__name__)
@@ -137,12 +142,12 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
     task = asyncio.create_task(worker())
     stop_reason = "interrupted"
     try:
-        while monotonic() < deadline and journal.sequence < max_events:
+        while monotonic() < deadline and (continuous or journal.sequence < max_events):
             try:
                 async with websockets.connect(ws_endpoint, open_timeout=12, ping_interval=20,
                                                ping_timeout=20, max_size=2**22, max_queue=64) as ws:
                     journal.write("connection_open", epoch=stats["reconnects"])
-                    if stats["reconnects"] and last_slot is not None:
+                    if (stats["reconnects"] or resume_slot is not None) and last_slot is not None:
                         recovered = await asyncio.to_thread(recover, rpc, max(0, last_slot-64), known=list(finalized), transaction_limit=5)
                         recovered_items = recovered.pop("recovered")
                         recovered["recovered_count"] = len(recovered_items)
@@ -155,16 +160,26 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
                                 journal.write("migration_notification", commitment="finalized", discovery="history_backfill",
                                               result={"context": {"slot": slot}, "value": {"signature": signature, "err": None, "logs": tx["meta"].get("logMessages", [])}})
                             journal.write("transaction", signature=signature, notification_slot=seen[signature], commitment="finalized", result=tx)
-                            finalized.add(signature)
+                            finalized[signature] = slot
                             if seen[signature] == slot:
                                 await snapshot_pools(tx, signature)
                         journal.write("recovery_report", **recovered)
+                        resume_slot = None
                     request_id = 1
                     requests, subscriptions = {1: ("logs", DBC)}, {}
                     subscribed = set()
                     await ws.send(json.dumps({"jsonrpc": "2.0", "id": 1, "method": "logsSubscribe",
                         "params": [{"mentions": [DBC]}, {"commitment": "confirmed"}]}))
-                    while monotonic() < deadline and journal.sequence < max_events:
+                    while monotonic() < deadline and (continuous or journal.sequence < max_events):
+                        if continuous and monotonic() - last_heartbeat >= 5:
+                            if task.done():
+                                raise RuntimeError("Finalization worker stopped")
+                            journal.write("heartbeat", last_slot=last_slot, last_message_at=last_message_at,
+                                          pending=queue.qsize(), worker_alive=not task.done(), **stats)
+                            last_heartbeat = monotonic()
+                            for mapping in (seen, finalized):
+                                while len(mapping) > 4096:
+                                    del mapping[next(iter(mapping))]
                         for pool in sorted(pools - subscribed):
                             request_id += 1
                             requests[request_id] = ("account", pool)
@@ -187,6 +202,7 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
                         subscription = subscriptions.get(params.get("subscription"))
                         if not subscription:
                             continue
+                        last_message_at = utc_now()
                         result = params["result"]
                         if subscription[0] == "account":
                             stats["pool_notifications"] += 1

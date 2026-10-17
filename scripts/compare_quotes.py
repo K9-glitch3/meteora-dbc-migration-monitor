@@ -42,7 +42,9 @@ def compare(path):
     for case, answer in zip(cases, reference):
         case.update(reference=answer, result="MATCH" if case["calculated"] == answer else "MISMATCH")
     return {"schema_version": "1.0", "source_capture_sha256": file_hash(path), "sdk": "@meteora-ag/cp-amm-sdk@1.5.1",
-            "lock_sha256": file_hash(ROOT/"package-lock.json"), "scope": "offline exact-input static-fee concentrated-liquidity SPL-token quotes; no fills or profitability",
+            "lock_sha256": file_hash(ROOT/"package-lock.json"),
+            "bigint_adapter_sha256": file_hash(ROOT/"vendor/bigint-buffer-safe/index.cjs"),
+            "scope": "offline exact-input static-fee concentrated-liquidity SPL-token quotes; no fills or profitability",
             "counts": dict(Counter(c["result"] for c in cases)), "cases": cases, "excluded": excluded}
 
 

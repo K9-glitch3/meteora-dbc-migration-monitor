@@ -1,0 +1,8 @@
+{
+  "name": "@dbc-monitor/bigint-buffer-safe",
+  "version": "1.0.0",
+  "description": "Bounded unsigned BigInt/Buffer adapter; no native code or install scripts",
+  "main": "index.cjs",
+  "license": "MIT",
+  "engines": {"node": ">=18"}
+}

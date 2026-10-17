@@ -35,6 +35,17 @@
       "notices": []
     },
     {
+      "name": "@dbc-monitor/bigint-buffer-safe",
+      "version": "1.0.0",
+      "declared_license": "MIT",
+      "notices": [
+        {
+          "file": "LICENSE",
+          "sha256": "bb19e53f9066a33dfcd0ad8cce170db558b8cc23c97f6884fa7325b422dfb8d9"
+        }
+      ]
+    },
+    {
       "name": "@meteora-ag/cp-amm-sdk",
       "version": "1.5.1",
       "declared_license": "MIT",
@@ -407,18 +418,6 @@
       ]
     },
     {
-      "name": "bigint-buffer",
-      "version": "1.1.5",
-      "declared_license": "Apache-2.0",
-      "integrity": "sha512-trfYco6AoZ+rKhKnxA0hgX0HAbVP/s808/EuDSe2JDzUnCp/xAsli35Orvk67UrTEcwuxZqYZDmfA2RXJgxVvA==",
-      "notices": [
-        {
-          "file": "LICENSE",
-          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
-        }
-      ]
-    },
-    {
       "name": "bignumber.js",
       "version": "9.3.1",
       "declared_license": "MIT",
@@ -427,18 +426,6 @@
         {
           "file": "LICENCE.md",
           "sha256": "def75ba75d6426f1c3f02addf8e175fbe6e0d8a82e541cbdffc16d2bd8fd7d6a"
-        }
-      ]
-    },
-    {
-      "name": "bindings",
-      "version": "1.5.0",
-      "declared_license": "MIT",
-      "integrity": "sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==",
-      "notices": [
-        {
-          "file": "LICENSE.md",
-          "sha256": "85fde19744c84cfacb04aed732c0392ba221231b26090d3271d2ed865bfc0792"
         }
       ]
     },
@@ -489,6 +476,18 @@
         {
           "file": "LICENSE",
           "sha256": "b045f14d68a6d261be7af212c53846b3b2d17917e3cb78f0f27042d14e070a03"
+        }
+      ]
+    },
+    {
+      "name": "bufferutil",
+      "version": "4.1.0",
+      "declared_license": "MIT",
+      "integrity": "sha512-ZMANVnAixE6AWWnPzlW2KpUrxhm9woycYvPOo67jWHyFowASTEd9s+QN1EIMsSDtwhIxN4sWE1jotpuDUIgyIw==",
+      "notices": [
+        {
+          "file": "LICENSE",
+          "sha256": "2b29dcfe0d6471f7e8c92c5fb38c9f93edee10330937055440192f1832b1ecef"
         }
       ]
     },
@@ -659,18 +658,6 @@
         {
           "file": "LICENSE",
           "sha256": "7179683e8000e6bdc9bbc60d85edf0a4ac8e76f951857f54fcb775d5886f1309"
-        }
-      ]
-    },
-    {
-      "name": "file-uri-to-path",
-      "version": "1.0.0",
-      "declared_license": "MIT",
-      "integrity": "sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==",
-      "notices": [
-        {
-          "file": "LICENSE",
-          "sha256": "75070206e4ee2a749be52444cecc05101ca8d314c9d6d335ff914046cbf086a0"
         }
       ]
     },
@@ -930,6 +917,30 @@
         {
           "file": "LICENSE",
           "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27"
+        }
+      ]
+    },
+    {
+      "name": "utf-8-validate",
+      "version": "6.0.6",
+      "declared_license": "MIT",
+      "integrity": "sha512-q3l3P9UtEEiAHcsgsqTgf9PPjctrDWoIXW3NpOHFdRDbLvu4DLIcxHangJ4RLrWkBcKjmcs/6NkerI8T/rE4LA==",
+      "notices": [
+        {
+          "file": "LICENSE",
+          "sha256": "d7ce0f3a5cea8942c47f889baffb79070a0c667e03c5eae63b946e336dbedded"
+        }
+      ]
+    },
+    {
+      "name": "utf-8-validate",
+      "version": "5.0.10",
+      "declared_license": "MIT",
+      "integrity": "sha512-Z6czzLq4u8fPOyx7TU6X3dvUZVvoJmxSQ+IcrlmagKhilxlhZgxPK6C5Jqbkw1IDUmFTM+cz9QDnnLTwDz/2gQ==",
+      "notices": [
+        {
+          "file": "LICENSE",
+          "sha256": "ebf774f60dd27325cfd62c233917dfcc8551f808f69ca8656be7d1eaf13c44f2"
         }
       ]
     },

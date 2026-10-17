@@ -1,40 +1,44 @@
-# Reference SDK dependencies
+# SDK dependency status / v0.4
 
-The browser dashboard and Python collector do not load the Node SDK dependency tree.
-Node tooling is an offline development/reference check, not a server or trading path.
+The browser loads no Node SDK. The Python collector has no wallet or signing
+path. A separate readiness sampler invokes the official DBC decoder locally on
+bounded, read-only RPC responses. SDK quote comparisons remain offline checks.
 
 - @meteora-ag/cp-amm-sdk 1.5.1: official DAMM v2 quote reference, MIT.
-- @meteora-ag/dynamic-bonding-curve-sdk 2.0.0: official DBC account decoder, MIT.
-- Exact versions/integrity hashes: package-lock.json.
-- SDK IDL/math attribution: docs/METEORA_SDK_LICENSE.txt and upstream package licenses.
+- @meteora-ag/dynamic-bonding-curve-sdk 2.0.0: official DBC decoder, MIT.
+- Exact versions and integrity hashes: package-lock.json.
+- SDK IDL/math attribution: METEORA_SDK_LICENSE.txt and upstream notices.
 
-Install with `npm ci --ignore-scripts`. Do not run npm rebuild on this reference
-environment. The bigint-buffer native addon must remain absent; the package uses
-its pure-JavaScript fallback. Captured accounts are bounded and locally supplied.
+## Native dependency removed
 
-On 16 October 2026, npm audit initially reported dependency advisories involving
-toml, jayson/stream-json/uuid and bigint-buffer. Overrides pin toml 4.2.0 and jayson
-5.0.0; the SDK comparison is rerun against that exact lockfile.
+The v0.3 tree retained bigint-buffer 1.1.5, affected by
+[GHSA-3gc7-fjrx-p6mg](https://github.com/advisories/GHSA-3gc7-fjrx-p6mg).
+Its upstream advisory has no fixed version. Disabling native builds was only
+a mitigation, not a fix.
 
-Residual: bigint-buffer 1.1.5 has GHSA-3gc7-fjrx-p6mg, a native toBigIntLE buffer
-overflow advisory with no upstream fixed version in this tree. Five high-severity
-package nodes remain flagged through that dependency chain. Disabling install
-scripts and verifying no native addon is built reduces exposure to that native
-path; it does not mean the dependency is patched or the project is audited.
-Do not deploy these reference dependencies as a public service. Reassess before
-accepting arbitrary untrusted inputs or enabling native builds.
+Version 0.4 replaces that package through an npm override with the local,
+independently implemented @dbc-monitor/bigint-buffer-safe 1.0.0 adapter.
+This is not a renamed copy of the vulnerable implementation. It has no native
+code, bindings dependency, lifecycle script or external dependency.
+Its four unsigned conversion functions reject negative values, overflow,
+non-BigInt input and widths over 1,024 bytes. Unsupported inputs fail closed.
+It is a deliberately narrower API, tested for this SDK use, not a universal
+drop-in replacement.
 
-Primary advisory: https://github.com/advisories/GHSA-3gc7-fjrx-p6mg
-SDK sources: https://github.com/MeteoraAg/damm-v2-sdk and
-https://github.com/MeteoraAg/dynamic-bonding-curve-sdk.
+Run npm ci --ignore-scripts, node scripts/check_bigint.cjs, npm audit,
+and python scripts/check_pilot.py. On 17 October 2026, clean installation and
+npm audit report zero known advisories. There are 212 valid conversion/layout
+cases plus negative controls. All 120 previously published quote cases and
+readiness decoder checks still pass, with unchanged case outputs. Only the
+lockfile provenance changed in the quote reports.
 
-## License inventory requiring follow-up
+This removes the identified dependency path; it does not establish that the
+SDKs, adapter or monitor are vulnerability-free or independently audited.
 
-docs/dependency-inventory.json records 86 installed package declarations and
-available top-level notice hashes. The SDKs' MIT declarations do not apply to
-every transitive dependency: rpc-websockets 9.3.9 declares LGPL-3.0-only; chain
-0.4.2 has no package license declaration or top-level notice; text-encoding-utf-8
-1.0.2 has a LICENSE.md but no package license declaration. These are explicit
-review items, not a legal conclusion about compatibility. Node modules are not
-bundled in the Python wheel or browser site. Do not assume this inventory clears
-future redistribution, proprietary bundling or company ownership.
+## Licensing remains separate
+
+dependency-inventory.json records current package declarations and notice hashes,
+not legal clearance. rpc-websockets declares LGPL-3.0-only; chain has no package
+license declaration or top-level notice; text-encoding-utf-8 has a LICENSE.md
+without a package declaration. These remain redistribution review items.
+Node modules are not bundled into the Python wheel or browser site.

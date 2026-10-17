@@ -46,7 +46,8 @@ def verify_readiness(receipt):
 
 
 def check():
-    assert not list((ROOT/"node_modules/bigint-buffer").rglob("*.node")), "Native bigint-buffer must not be built"
+    import subprocess
+    subprocess.run(["node", str(ROOT/"scripts/check_bigint.cjs")], check=True, cwd=ROOT)
     feed_path=ROOT/"docs/api/v1/feed.json"
     feed=json.loads(feed_path.read_text())
     readiness_path=ROOT/"evidence/readiness-2026-10-16.json"

@@ -1,7 +1,8 @@
 'use strict';
 const $ = id => document.getElementById(id);
 const addressPattern = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-let feed, page = 0, storageAvailable = true, initialized = false;
+let feed, page = 0, storageAvailable = true, initialized = false, apiBase = '', refreshing = false, refreshFailed = false;
+const recordedMode = new URLSearchParams(location.search).get('mode') === 'recorded';
 function readStorage(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { storageAvailable=false; return fallback; } }
 let watched = readStorage('dbc.watch.v1', []);
 if (!Array.isArray(watched)) watched=[];
@@ -20,13 +21,21 @@ function watch(address) { if(!addressPattern.test(address))return;if(!watched.in
 function watchButton(address) { const b=el('button',watched.includes(address)?'\u2713':'+');b.disabled=!address || watched.includes(address);b.title='Watch '+(address||'unresolved address');b.setAttribute('aria-label',b.title);b.onclick=()=>watch(address);return b; }
 function cell(row, content) { const td=el('td');td.append(typeof content==='string'?document.createTextNode(content):content);row.append(td); }
 function accountLink(address) { if(!address)return el('span','Unresolved');const a=el('a',short(address));a.href='https://solscan.io/account/'+encodeURIComponent(address);a.target='_blank';a.rel='noopener noreferrer';a.title=address;return a; }
-function openDetail(r) { $('detail-json').textContent=JSON.stringify(r,null,2);$('detail-links').replaceChildren();const tx=el('a','Finalized transaction source');tx.href='https://solscan.io/tx/'+encodeURIComponent(r.signature);tx.target='_blank';tx.rel='noopener noreferrer';const raw=el('a','Raw capture');raw.href='https://github.com/K9-glitch3/meteora-dbc-migration-monitor/blob/master/evidence/'+encodeURIComponent(feed.source_run)+'/capture.jsonl';raw.target='_blank';raw.rel='noopener noreferrer';$('detail-links').append(tx,raw);$('detail').showModal(); }
+function openDetail(r) {
+  $('detail-json').textContent=JSON.stringify(r,null,2);$('detail-links').replaceChildren();
+  const tx=el('a','Transaction source');tx.href='https://solscan.io/tx/'+encodeURIComponent(r.signature);tx.target='_blank';tx.rel='noopener noreferrer';$('detail-links').append(tx);
+  const links=recordedMode ? [['Raw capture','https://github.com/K9-glitch3/meteora-dbc-migration-monitor/blob/master/evidence/'+encodeURIComponent(feed.source_run)+'/capture.jsonl']] :
+    (r.evidence_ids||[]).filter(id=>/^[a-f0-9]{64}$/.test(id)).map((id,i)=>['Evidence '+(i+1),apiBase+'/v1/evidence/'+id]);
+  for(const [title,url] of links){const a=el('a',title);a.href=url;a.target='_blank';a.rel='noopener noreferrer';$('detail-links').append(a);}
+  $('detail').showModal();
+}
 function addActivity(manual) {
   if(!feed)return;
   for(const r of [...feed.migrations,...feed.readiness].filter(matches)) {
     const key=(r.signature||r.virtual_pool)+':'+r.stage;
     if(seenActivity.includes(key))continue;
-    const text=(manual||!initialized?'Recorded match':'Newly observed snapshot state')+' / '+r.stage+' / '+(r.pool||r.virtual_pool||r.signature)+' / captured '+r.observed_at;
+    const label=recordedMode?'Recorded match':manual||!initialized?'Existing feed match':'New live-feed observation';
+    const text=label+' / '+r.stage+' / '+(r.pool||r.virtual_pool||r.signature)+' / observed '+r.observed_at;
     alerts.unshift({key,text});seenActivity.push(key);
   }
   alerts=alerts.slice(0,100);seenActivity=seenActivity.slice(-1000);save();initialized=true;
@@ -47,17 +56,44 @@ function render(manual=false) {
   $('migration-count').textContent=rows.length+(rows.length===1?' observation':' observations');$('migration-empty').hidden=rows.length!==0;$('page').textContent='Page '+(page+1)+' of '+pages;$('previous').disabled=page===0;$('next').disabled=page>=pages-1;
   $('alerts').replaceChildren(...alerts.map(a=>el('li',a.text)));$('alerts-empty').hidden=alerts.length!==0;
 }
+function updateStatus() {
+  if(!feed || refreshFailed)return;
+  if(recordedMode){$('status').className='error';$('status').textContent='Historical recorded snapshot / not live';return;}
+  const times=[feed.generated_at,feed.health.heartbeat_at,feed.health.last_message_at];
+  const stale=times.some(t=>!Number.isFinite(Date.parse(t))||Date.now()-Date.parse(t)>30000||Date.parse(t)-Date.now()>5000);
+  const status=stale?'stale':feed.health.status;
+  $('status').className=status==='live'?'':'error';
+  $('status').textContent=(status==='live'?'Live mainnet stream':status.toUpperCase()+' / coverage impaired')+' / slot '+(feed.health.last_slot??'pending')+' / '+(feed.health.counters.log_notifications??0)+' log notifications / '+(feed.health.pending??0)+' awaiting finality';
+  $('readiness-status').textContent='Sampled / '+(Date.now()-Date.parse(feed.readiness_recorded_until)>180000?'stale':feed.readiness_status)+' / not a forecast';
+}
 async function refresh() {
-  $('refresh').disabled=true;
-  try { const response=await fetch('api/v1/feed.json',{cache:'no-store',signal:AbortSignal.timeout(15000)});if(!response.ok)throw new Error('HTTP '+response.status);const data=await response.json();
-    if(data.api_version!=='1.0'||data.mode!=='recorded_snapshot'||!Array.isArray(data.migrations)||!Array.isArray(data.readiness))throw new Error('Unsupported feed');
-    feed=data;$('migration-time').textContent=feed.migration_recorded_until;$('readiness-time').textContent=feed.readiness_recorded_until;
-    const stale=[feed.migration_recorded_until,feed.readiness_recorded_until].some(t=>!Number.isFinite(Date.parse(t))||Date.now()-Date.parse(t)>feed.limits.stale_after_seconds*1000);
-    $('status').className=stale?'error':'';$('status').textContent=(stale?'Historical / stale snapshot':'Recent recorded snapshot')+' · Not a continuous live feed'+(feed.readiness_errors.length?' · Readiness collection errors retained':'');render();
-  } catch(error) { $('status').className='error';$('status').textContent='Refresh failed. '+(feed?'Previously loaded data retained. ':'')+error.message; }
-  finally { $('refresh').disabled=false; }
+  if(refreshing)return;
+  refreshing=true;$('refresh').disabled=true;
+  try {
+    if(!recordedMode) {
+      const response=await fetch('live-config.json',{cache:'no-store',signal:AbortSignal.timeout(10000)});
+      if(!response.ok)throw new Error('Live endpoint configuration unavailable');
+      const config=await response.json();
+      const endpoint=new URL(config.endpoint);
+      if(!config.enabled||endpoint.protocol!=='https:'||endpoint.username||endpoint.password||endpoint.port||!endpoint.hostname.endsWith('.trycloudflare.com'))throw new Error('Live endpoint unavailable');
+      apiBase=endpoint.origin;
+    }
+    const url=recordedMode?'api/v1/feed.json':apiBase+'/v1/feed.json';
+    const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(10000)});
+    if(!response.ok)throw new Error('HTTP '+response.status);
+    const data=await response.json();
+    if(data.api_version!==(recordedMode?'1.0':'2.0')||data.mode!==(recordedMode?'recorded_snapshot':'continuous_live')||!Array.isArray(data.migrations)||!Array.isArray(data.readiness)||(!recordedMode&&!data.health))throw new Error('Unsupported feed');
+    feed=data;refreshFailed=false;$('migration-time').textContent=feed.migration_recorded_until||'Waiting for upstream';$('readiness-time').textContent=feed.readiness_recorded_until||'Waiting for sample';$('json-api').href=url;
+    updateStatus();render();
+  } catch(error) { refreshFailed=true;$('status').className='error';$('status').textContent='OFFLINE / refresh failed. '+(feed?'Previously loaded data retained, not current. ':'')+error.message; }
+  finally { refreshing=false;$('refresh').disabled=false; }
 }
 $('watch-form').onsubmit=e=>{e.preventDefault();$('input-status').textContent='';const address=$('address').value.trim();if(!addressPattern.test(address)){$('input-status').textContent='Enter a valid Solana address.';return;}watch(address);$('address').value='';};
 $('refresh').onclick=refresh;$('watch-only').onchange=()=>{page=0;render();};$('search').oninput=()=>{page=0;render();};$('stage').onchange=()=>{page=0;render();};$('previous').onclick=()=>{page--;render();};$('next').onclick=()=>{page++;render();};$('close-detail').onclick=()=>$('detail').close();$('clear-alerts').onclick=()=>{alerts=[];save();$('alerts').replaceChildren();$('alerts-empty').hidden=false;};
-setInterval(()=>{if($('auto-refresh').checked&&!document.hidden)refresh();},60000);
+$('feed-mode').value=recordedMode?'recorded':'live';
+$('feed-mode').onchange=()=>{location.search=$('feed-mode').value==='recorded'?'?mode=recorded':'';};
+$('mode-label').textContent=recordedMode?'Read-only / historical':'Read-only / continuous stream';
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+setInterval(()=>{if($('auto-refresh').checked&&!document.hidden)refresh();},5000);
+setInterval(updateStatus,1000);
 render();refresh();

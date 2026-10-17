@@ -4,13 +4,14 @@
 [Build updates](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/updates.html) |
 [CI](https://github.com/K9-glitch3/meteora-dbc-migration-monitor/actions/workflows/ci.yml)
 
-Read-only developer tooling for Meteora DBC migrations to DAMM v2. Version 0.3
-adds supported same-state SDK quote comparisons, sampled migration readiness,
-a browser-local watchlist, recorded read API and bounded finalized-history recovery.
+Read-only developer tooling for Meteora DBC migrations to DAMM v2. Version 0.4
+adds a continuous mainnet collector, public live JSON API, five-second browser
+refresh, separate freshness/health indicators, and bounded durable retention.
+This is a PC-hosted, best-effort pilot, not an independently hosted uptime service.
 
 [Open watchlist](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/monitor.html) |
 [Developer pilot](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/pilot.html) |
-[Read API](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/api/v1/feed.json)
+[Live endpoint discovery](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/live-config.json)
 
 [One-minute walkthrough](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/updates.html#walkthrough) |
 [Continuation plan](docs/CONTINUATION.md)
@@ -37,8 +38,10 @@ on identical captured bytes. This is not an external audit or execution evidence
 ## Developer workflow and reference checks
 
 The watchlist supports browser-local saved addresses, stage filters, evidence links
-and recorded activity. The versioned public API is a manually refreshed snapshot,
-not a continuous hosted stream. It reports capture timestamps and stale data.
+and local activity. The default view uses the continuous stream; the historical
+v1 API remains recorded evidence, not a live fallback. Live v2 reports upstream
+message time, heartbeat, queue depth, errors, pool states and retained evidence.
+Readiness is resampled separately, not represented as a complete pool stream.
 No background email/push/webhook alerts or uptime SLA are offered in this pilot.
 
 ```powershell
@@ -49,10 +52,14 @@ python scripts/capture_readiness.py runs/readiness.json
 ```
 
 Read [dependency limitations](docs/DEPENDENCIES.md) before installing the offline
-reference SDKs. Five high-severity dependency nodes remain flagged through the
-unpatched bigint-buffer native-addon dependency. No Node SDK is loaded by the
-browser or Python collector. Do not enable native builds or expose this tooling
-as a public service.
+reference SDKs. The vulnerable bigint-buffer package has been replaced with a
+bounded, independently implemented pure-JavaScript adapter. Clean install and
+audit report zero known vulnerabilities as of 17 October 2026; this is not an audit
+of the project. The readiness sampler invokes the pinned SDK decoder locally.
+The public API exposes no input-to-SDK, signing, proxy or filesystem route.
+
+See [live operations](docs/LIVE_OPERATIONS.md) for the PC dependency, restart,
+endpoint publication, retention and recovery limits.
 
 See the [pilot contract](docs/PILOT.md) and [independent review brief](docs/REVIEW_SCOPE.md).
 Three invitations and a review enquiry have been sent; acceptance, integration,

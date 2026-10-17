@@ -8,16 +8,18 @@ completed during the judged period.
 ## A 15-minute first integration
 
 1. Open [the watchlist](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/monitor.html).
-2. Add a pool, virtual pool or mint from the recorded sample. Watchlists stay in
+2. Add a pool, virtual pool or mint from the live feed. Watchlists stay in
    your browser. No wallet connection is required.
 3. Inspect a migration and its transaction/raw-capture links. Compare the stage
    and missing evidence with your usual logs.
-4. Fetch the versioned read API:
-   `https://k9-glitch3.github.io/meteora-dbc-migration-monitor/api/v1/feed.json`.
+4. Discover the current public endpoint from:
+   `https://k9-glitch3.github.io/meteora-dbc-migration-monitor/live-config.json`.
+   Fetch its `/v1/feed.json` route (API contract version 2.0).
 5. Run `python examples/read_feed.py --address YOUR_PUBLIC_ADDRESS` from a clone.
-   This reads a recorded snapshot. It is not a continuously hosted live stream.
-6. Replay the source run with `python -m dbc_monitor verify evidence/RUN_NAME`.
-   `source_run` in the feed supplies RUN_NAME.
+   This discovers the continuous live feed and reports stale/degraded health.
+6. Follow the live evidence IDs to `/v1/evidence/{id}`; raw evidence expires
+   under bounded retention. For permanent replay, switch to Historical evidence
+   and run `python -m dbc_monitor verify evidence/RUN_NAME` on its source run.
 
 ## What each stage means
 
@@ -37,13 +39,15 @@ timestamps and may refer to different pools. Never infer a missing history stage
 ## Alerts and API limitations
 
 Browser activity records watched matches and newly observed stages when the page
-refreshes a published snapshot. Old observations say "Recorded match". Clearing
+refreshes the live API. Initial observations say "Existing feed match". Clearing
 activity does not establish a new on-chain state. There is no email, push or webhook
-delivery and no background monitoring after closing the page. No uptime SLA applies.
-The public feed is manually refreshed from bounded runs; refreshing the browser
-does not trigger RPC collection. Staleness is explicit after five minutes.
+delivery and no browser alerts after closing the page. The collector continues
+independently of browser tabs while its host PC is running. No uptime SLA applies.
+The browser polls every five seconds, independently of continuous RPC collection.
+Upstream silence becomes stale after 30 seconds. Readiness is resampled separately.
 
-Fields are versioned under api_version 1.0. Integers too large for JavaScript are
+Live fields are versioned under api_version 2.0; recorded v1 remains available.
+Integers too large for JavaScript are
 decimal strings. Treat unknown stages or schemas as unsupported, not successful.
 The quotes.json endpoint is a separate same-state offline comparison report, not
 an executable quote service. Never route trades from this pilot API.

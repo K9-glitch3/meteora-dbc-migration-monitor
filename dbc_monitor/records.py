@@ -106,11 +106,16 @@ def _freshness(when, block_time, max_age):
     return "fresh" if -5 <= age <= max_age else "stale"
 
 
-def derive(captures, *, source="mainnet_capture", max_age=120):
+def derive(captures, *, source="mainnet_capture", max_age=120, _state=None):
     """Rebuild observations from captured responses; never trust stored verdicts."""
-    result, notifications, pool_slots, transaction_migrations = [], {}, {}, {}
-    finalized_seen, account_seen = set(), set()
-    previous = 0
+    state = {} if _state is None else _state
+    result = []
+    notifications = state.setdefault("notifications", {})
+    pool_slots = state.setdefault("pool_slots", {})
+    transaction_migrations = state.setdefault("transaction_migrations", {})
+    finalized_seen = state.setdefault("finalized_seen", set())
+    account_seen = state.setdefault("account_seen", set())
+    previous = state.get("previous", 0)
     def emit(capture, **values):
         record = {"schema_version": "1.0", "source": source, "sequence": capture["sequence"],
                   "observed_at": capture["observed_at"], "slot": None, "signature": None, "pool": None,
@@ -213,4 +218,5 @@ def derive(captures, *, source="mainnet_capture", max_age=120):
         elif kind in ("gap", "rpc_error", "decode_error", "slot_conflict", "recovery_report"):
             emit(c, reason=c.get("reason", kind), details={k:v for k,v in c.items()
                  if k not in ("capture_version", "sequence", "observed_at")})
+    state["previous"] = previous
     return result
