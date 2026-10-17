@@ -1,6 +1,7 @@
 # DBC Migration Monitor
 
-[Evidence explorer](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/) |
+[Live monitor](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/) |
+[Historical evidence](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/evidence.html) |
 [Build updates](https://k9-glitch3.github.io/meteora-dbc-migration-monitor/updates.html) |
 [CI](https://github.com/K9-glitch3/meteora-dbc-migration-monitor/actions/workflows/ci.yml)
 

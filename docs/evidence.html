@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Inspect DBC migrations, finalized transaction evidence and DAMM v2 pool state.">
+<title>DBC Migration Monitor | Evidence Explorer</title>
+<link rel="stylesheet" href="dashboard.css">
+<script src="explorer.js" defer></script>
+</head>
+<body>
+<header><a class="brand" href="./"><img src="project-mark.png" alt="" width="44" height="44"><span>DBC Migration Monitor<small>Meteora / Solana</small></span></a>
+<nav aria-label="Project links"><a href="monitor.html">Live monitor</a><a href="pilot.html">Developer pilot</a><a href="updates.html">Build updates</a><a href="https://github.com/K9-glitch3/meteora-dbc-migration-monitor">GitHub</a></nav></header>
+<main>
+<div class="page-heading"><div><p class="eyebrow">Evidence explorer <span>v0.2</span></p><h1>Migration observations</h1></div><label>Dataset<select id="dataset" aria-label="Dataset"></select></label></div>
+<div id="status" role="status">Loading evidence...</div>
+<section class="run-band" aria-label="Run information"><div><span class="label">Source</span><strong id="source">Pending</strong></div><div><span class="label">Recorded</span><strong id="recorded">Pending</strong></div><div><span class="label">Duration</span><strong id="duration">Pending</strong></div><div><span class="label">Evidence</span><a id="manifest" href="#">Manifest</a> <a id="capture" href="#">Raw capture</a></div></section>
+<section class="stats" aria-label="Run totals"><div><span>Finalized migrations</span><strong id="migration-count">0</strong></div><div><span>Pool state observations</span><strong id="pool-count">0</strong></div><div><span>Distinct pools</span><strong id="distinct-count">0</strong></div><div><span>Health observations</span><strong id="health-count">0</strong></div></section>
+<div class="scope-note"><strong>This explorer's comparison scope: migration identity.</strong> Pool prices here are exact ratios derived from captured state. The separate <a href="quotes.html">v0.3 quote report</a> compares supported static-fee snapshots against Meteora's SDK. Account updates marked confirmed may not be finalized.</div>
+<section class="timeline" aria-label="Activity timeline"><div class="section-title"><h2>Recorded activity</h2><span id="timeline-label"></span></div><canvas id="activity" height="88" aria-label="Observations by capture time"></canvas></section>
+<section class="workspace" aria-labelledby="observations-title">
+<div class="section-title"><h2 id="observations-title">Observations</h2><span id="count"></span></div>
+<div class="filters"><label class="search">Search<input id="search" type="search" placeholder="Pool, transaction or reason" autocomplete="off"></label><label>Result<select id="verdict"><option value="">All results</option><option value="SUPPORTED_COMPARISON">Identity matched</option><option value="NO_CONCLUSION">No conclusion</option><option value="UNSUPPORTED_CONFIGURATION">Unsupported</option><option value="REJECTED_OBSERVATION">Rejected</option></select></label><label>Stage<select id="stage"><option value="">All stages</option><option>DETECTED</option><option>FINALIZED</option><option>POOL_STATE</option><option>HEALTH</option></select></label><label>Freshness<select id="freshness"><option value="">All</option><option value="fresh">Fresh</option><option value="stale">Stale</option><option value="unknown">Unknown</option></select></label><button id="download" title="Download filtered observations as JSON" aria-label="Download filtered observations">Download JSON</button></div>
+<div class="table-wrap"><table><thead><tr><th>Observed (UTC)</th><th>Stage</th><th>Slot</th><th>Pool / transaction</th><th>Result</th><th>Reason</th><th>Detail</th></tr></thead><tbody id="rows"></tbody></table></div>
+<p id="empty" hidden>No observations match these filters.</p>
+<div class="pagination"><button id="previous" aria-label="Previous page" title="Previous page">&#8592;</button><span id="page">Page 1</span><button id="next" aria-label="Next page" title="Next page">&#8594;</button></div>
+</section>
+<footer><span>Recorded evidence. This page does not stream live data.</span><a href="observation.schema.json">Observation schema</a><a href="https://github.com/K9-glitch3/meteora-dbc-migration-monitor/actions/workflows/ci.yml">Automated verification</a></footer>
+</main>
+<dialog id="detail"><div class="dialog-top"><h2>Observation details</h2><button id="close-detail" aria-label="Close details" title="Close details">&#215;</button></div><dl id="detail-summary"></dl><p id="detail-links"></p><pre id="detail-json"></pre></dialog>
+</body>
+</html>
