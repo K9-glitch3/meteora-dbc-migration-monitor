@@ -1,7 +1,7 @@
 name: dbc-monitor
 services:
   collector:
-    image: dbc-monitor:0.4.1
+    image: dbc-monitor:0.4.2
     build:
       context: ..
     restart: unless-stopped

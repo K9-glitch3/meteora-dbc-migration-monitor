@@ -1,4 +1,4 @@
-# Independently hosted continuous pilot / v0.4.1
+# Independently hosted continuous pilot / v0.4.2
 
 ## Architecture
 
@@ -30,6 +30,15 @@ The UI independently ages the returned timestamps, including when refresh is off
 Readiness is an up-to-eight-pool sample repeated 90 seconds after each completed
 sample; it has its own timestamp and becomes stale after 180 seconds.
 It is not full-market discovery, a migration forecast or a continuous account stream.
+
+Version 0.4.2 requests transaction versions through 1 in readiness, finalization
+and recovery. Legacy and v0 JSON decoding remains supported, including v0 loaded
+addresses. Version 1 uses inline accounts; unexpected lookup-table data and future
+versions are rejected. Transaction resource configuration is not interpreted as
+trade execution or profitability evidence. See the official
+[Solana versioned-transaction documentation](https://solana.com/docs/core/transactions/versioned-transactions).
+The read-only `scripts/check_v1_readiness.py` check exercises the historical v1
+transaction that exposed the issue, with current finalized pool/config reads.
 
 The service is now on an existing DigitalOcean server, independent of Michael's PC.
 Both containers restart automatically after process failure and host boot.
@@ -71,8 +80,8 @@ TLS state is /var/lib/dbc-monitor-tls. Both directories belong to UID/GID 65532.
 Base images are pinned by digest. The public proxy has no admin API or file route.
 Deploy from a reviewed checkout, with at least 2 GiB free after image installation:
 
-    docker compose -f deploy/compose.yaml build
-    docker compose -f deploy/compose.yaml up -d --no-build
+    docker compose -f deploy/compose.yaml build collector
+    docker compose -f deploy/compose.yaml up -d --no-deps --no-build collector
     docker compose -f deploy/compose.yaml ps
 
 Restart only this service with:
@@ -90,6 +99,13 @@ restart a container. Collection reconnects internally; process exits restart.
 Preserve the SQLite directory across redeployments. A consistent SQLite backup,
 not a raw copy of an open database, was used for the initial migration.
 Evidence receipts are in evidence/hosting-2026-10-17.
+
+For collector-only upgrades, preserve the previous image for rollback and take a
+consistent SQLite backup first. Check unaffected service/container process IDs and
+start times before and after. Use a separate resource-limited builder on this
+shared host; do not change the global builder selection. The proxy remains on
+0.4.1 because this release does not change it. Expect a brief collector interruption
+and explicitly recorded startup/recovery coverage gaps, not seamless coverage.
 
 The old PC collector, tunnel and publishing supervisor are stopped. Its Startup
 shortcut was moved out of Startup, with its database preserved for rollback.

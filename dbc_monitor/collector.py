@@ -8,6 +8,7 @@ from pathlib import Path
 from time import monotonic
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
+from .protocol import MAX_SUPPORTED_TRANSACTION_VERSION
 
 DBC = "dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN"
 DAMM = "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG"
@@ -120,7 +121,7 @@ async def collect(directory, *, seconds=1800, endpoint=None, ws_endpoint=None,
                 for attempt in range(12):
                     try:
                         final = await asyncio.to_thread(rpc.call, "getTransaction", [signature,
-                            {"encoding": "json", "commitment": "finalized", "maxSupportedTransactionVersion": 0}])
+                            {"encoding": "json", "commitment": "finalized", "maxSupportedTransactionVersion": MAX_SUPPORTED_TRANSACTION_VERSION}])
                         if final is not None:
                             break
                     except RpcError as exc:

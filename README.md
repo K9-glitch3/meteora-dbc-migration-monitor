@@ -8,7 +8,7 @@
 Read-only developer tooling for Meteora DBC migrations to DAMM v2. Version 0.4
 adds a continuous mainnet collector, public live JSON API, five-second browser
 refresh, separate freshness/health indicators, and bounded durable retention.
-Version 0.4.1 runs continuously on an independent remote server, with persistent
+Version 0.4.2 runs continuously on an independent remote server, with persistent
 storage, automatic restart and HTTPS. It does not need my PC or browser to remain
 on. This reuses existing paid hosting without a new subscription; no uptime SLA
 or complete chain coverage is claimed.

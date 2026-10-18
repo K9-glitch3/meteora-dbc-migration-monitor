@@ -1,5 +1,5 @@
 """Budgeted finalized-history recovery; unresolved history is never called complete."""
-from .protocol import DBC, migrations
+from .protocol import DBC, migrations, MAX_SUPPORTED_TRANSACTION_VERSION
 from .collector import RpcError
 
 
@@ -32,7 +32,7 @@ def recover(rpc, since_slot, *, known=(), signature_limit=100, transaction_limit
                 continue
             report["transactions_requested"] += 1
             try:
-                tx = rpc.call("getTransaction", [signature, {"encoding": "json", "commitment": "finalized", "maxSupportedTransactionVersion": 0}])
+                tx = rpc.call("getTransaction", [signature, {"encoding": "json", "commitment": "finalized", "maxSupportedTransactionVersion": MAX_SUPPORTED_TRANSACTION_VERSION}])
                 if tx is None or tx["slot"] != slot or tx["transaction"]["signatures"][0] != signature:
                     report["unresolved"] += 1
                     continue

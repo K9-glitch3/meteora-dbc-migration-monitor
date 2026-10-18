@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT))
 from dbc_monitor.collector import Rpc, RpcError, DBC, utc_now
 from dbc_monitor.lifecycle import readiness
 from dbc_monitor.records import canonical, digest
+from dbc_monitor.protocol import account_keys, MAX_SUPPORTED_TRANSACTION_VERSION
 
 
 def decode(items):
@@ -32,14 +33,15 @@ def capture():
         keys = []
         for row in [s for s in signatures if s.get("err") is None][:4]:
             try:
-                tx = call("getTransaction", [row["signature"], {"commitment": "finalized", "encoding": "json", "maxSupportedTransactionVersion": 0}])
+                tx = call("getTransaction", [row["signature"], {"commitment": "finalized", "encoding": "json", "maxSupportedTransactionVersion": MAX_SUPPORTED_TRANSACTION_VERSION}])
                 if tx is None:
                     receipt["errors"].append("transaction_unavailable")
                     continue
-                loaded = tx["meta"].get("loadedAddresses", {})
-                keys += tx["transaction"]["message"]["accountKeys"] + loaded.get("writable", []) + loaded.get("readonly", [])
-            except RpcError as error:
-                receipt["errors"].append(str(error))
+                if tx["transaction"]["signatures"][0] != row["signature"] or tx["meta"]["err"] is not None:
+                    raise ValueError("Transaction identity or success mismatch")
+                keys += account_keys(tx)
+            except (RpcError, ValueError, KeyError, TypeError, IndexError) as error:
+                receipt["errors"].append(str(error) if isinstance(error, RpcError) else type(error).__name__)
         keys = list(dict.fromkeys(keys))[:80]
         if keys:
             accounts = call("getMultipleAccounts", [keys, {"commitment": "finalized", "encoding": "base64"}])

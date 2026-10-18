@@ -31,11 +31,14 @@ class CollectorTests(unittest.IsolatedAsyncioTestCase):
                 if self.messages: return json.dumps(self.messages.pop(0))
                 raise OSError("Disconnected")
         epochs=[]
+        transaction_requests=[]
         def connect(*args,**kwargs):
             epochs.append(1)
             return Socket(len(epochs))
         def rpc(self,method,params):
-            if method == "getTransaction": return transaction()
+            if method == "getTransaction":
+                transaction_requests.append(params)
+                return {**transaction(), "version": 1}
             return {"context":{"slot":101},"value":[None,None,None]}
         original_sleep = asyncio.sleep
         async def fast_sleep(seconds):
@@ -52,6 +55,8 @@ class CollectorTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(any(x["kind"]=="slot_conflict" for x in rows))
             self.assertEqual(rows[-1]["kind"],"run_end")
             self.assertEqual(sum(x["kind"]=="migration_notification" for x in rows),1)
+            self.assertTrue(transaction_requests)
+            self.assertTrue(all(p[1]["maxSupportedTransactionVersion"] == 1 for p in transaction_requests))
 
     async def test_invalid_capacity_prevents_network(self):
         with self.assertRaises(ValueError): await collect("unused",seconds=0)
